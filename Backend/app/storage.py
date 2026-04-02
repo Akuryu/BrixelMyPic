@@ -9,6 +9,7 @@ class Storage:
     def __init__(self, jobs_root: Path | None = None):
         self.jobs_root = jobs_root or settings.jobs_root
         self.jobs_root.mkdir(parents=True, exist_ok=True)
+        settings.tmp_root.mkdir(parents=True, exist_ok=True)
 
     def job_dir(self, code: str) -> Path:
         return self.jobs_root / code
@@ -25,6 +26,7 @@ class Storage:
         return self.job_dir(code) / "output.zip"
 
     def save_metadata(self, code: str, payload: dict):
+        self.ensure_job_dir(code)
         write_json(self.metadata_path(code), payload)
 
     def load_metadata(self, code: str) -> dict:

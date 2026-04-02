@@ -13,6 +13,7 @@ from PIL import Image
 
 from app.core_vendor.lego_mosaic_pro.cli import DEFAULT_CATALOG, DEFAULT_OWNED, DEFAULT_PALETTE, PIECE_CHOICES
 from app.core_vendor.lego_mosaic_pro.core import MosaicConfig, generate_mosaic
+from app.settings import settings
 
 BOOL_TRUE = {"1", "true", "on", "yes", "y"}
 RESIZE_MODE_MAP = {"contain": "fit", "cover": "fill", "stretch": "stretch"}
@@ -108,7 +109,8 @@ def _run_core(image_bytes: bytes, params: dict[str, Any], output_dir: Path) -> t
 
 
 def generate_preview_from_bytes(image_bytes: bytes, params: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
-    with tempfile.TemporaryDirectory(prefix="leobrick_preview_") as tmp_dir:
+    settings.tmp_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="leobrick_preview_", dir=settings.tmp_root) as tmp_dir:
         out_dir = Path(tmp_dir) / "output"
         result, normalized = _run_core(image_bytes, params, out_dir)
         preview_path = Path(result["preview_stud"] or result["preview_pixel"])

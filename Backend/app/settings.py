@@ -14,5 +14,9 @@ class Settings(BaseModel):
     def jobs_root(self) -> Path:
         return self.storage_root / "jobs"
 
+    @property
+    def tmp_root(self) -> Path:
+        return self.storage_root / "tmp"
+
 
 settings = Settings()
