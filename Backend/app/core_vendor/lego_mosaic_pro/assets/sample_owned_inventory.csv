@@ -1,0 +1,19 @@
+piece_type;color_name;owned_qty
+tile_1x1_square;White;50
+tile_1x1_square;Medium Stone Grey;70
+tile_1x1_square;Dark Stone Grey;90
+tile_1x1_square;Black;110
+tile_1x1_square;New Dark Red;130
+tile_1x1_square;Bright Red;50
+tile_1x1_square;Reddish Orange;70
+tile_1x1_square;Vibrant Coral;90
+tile_1x1_square;Dark Brown;110
+tile_1x1_square;Umber Brown;130
+tile_1x1_square;Reddish Brown;50
+tile_1x1_square;Medium Brown;70
+tile_1x1_square;Sand Yellow;90
+tile_1x1_square;Brick Yellow;110
+tile_1x1_square;Light Nougat;130
+tile_1x1_square;Warm Tan;50
+tile_1x1_square;Nougat;70
+tile_1x1_square;Medium Nougat;90

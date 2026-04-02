@@ -1,0 +1,151 @@
+piece_type;piece_name;part_id;color_name;lego_color_id;bricklink_color_id;rgb;available;avg_price_eur
+tile_1x1_round;Tile 1x1 Round;98138;White;1;1;#F4F4F4;false;0.055
+plate_1x1_round;Plate 1x1 Round;4073;White;1;1;#F4F4F4;false;0.038
+tile_1x1_square;Tile 1x1;3070b;White;1;1;#F4F4F4;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Medium Stone Grey;194;86;#969696;true;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Medium Stone Grey;194;86;#969696;true;0.047
+tile_1x1_square;Tile 1x1;3070b;Medium Stone Grey;194;86;#969696;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Dark Stone Grey;199;85;#646464;true;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Dark Stone Grey;199;85;#646464;true;0.056
+tile_1x1_square;Tile 1x1;3070b;Dark Stone Grey;199;85;#646464;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Black;26;11;#1B2A34;true;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Black;26;11;#1B2A34;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Black;26;11;#1B2A34;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;New Dark Red;154;59;#720012;true;0.058
+plate_1x1_round;Plate 1x1 Round;4073;New Dark Red;154;59;#720012;true;0.053
+tile_1x1_square;Tile 1x1;3070b;New Dark Red;154;59;#720012;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Bright Red;21;5;#B40000;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Bright Red;21;5;#B40000;true;0.041
+tile_1x1_square;Tile 1x1;3070b;Bright Red;21;5;#B40000;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Reddish Orange;402;167;#D14905;true;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Reddish Orange;402;167;#D14905;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Reddish Orange;402;167;#D14905;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Vibrant Coral;353;220;#FF6666;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Vibrant Coral;353;220;#FF6666;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Vibrant Coral;353;220;#FF6666;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Dark Brown;308;120;#372100;true;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Dark Brown;308;120;#372100;true;0.047
+tile_1x1_square;Tile 1x1;3070b;Dark Brown;308;120;#372100;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Umber Brown;423;168;#543F33;false;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Umber Brown;423;168;#543F33;true;0.056
+tile_1x1_square;Tile 1x1;3070b;Umber Brown;423;168;#543F33;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Reddish Brown;192;88;#5F3109;true;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Reddish Brown;192;88;#5F3109;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Reddish Brown;192;88;#5F3109;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;Medium Brown;370;240;#755945;true;0.058
+plate_1x1_round;Plate 1x1 Round;4073;Medium Brown;370;240;#755945;false;0.053
+tile_1x1_square;Tile 1x1;3070b;Medium Brown;370;240;#755945;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Sand Yellow;138;69;#897D62;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Sand Yellow;138;69;#897D62;true;0.041
+tile_1x1_square;Tile 1x1;3070b;Sand Yellow;138;69;#897D62;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Brick Yellow;5;2;#B0A06F;true;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Brick Yellow;5;2;#B0A06F;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Brick Yellow;5;2;#B0A06F;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Light Nougat;283;90;#FFC995;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Light Nougat;283;90;#FFC995;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Light Nougat;283;90;#FFC995;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Warm Tan;371;241;#CCA373;true;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Warm Tan;371;241;#CCA373;true;0.047
+tile_1x1_square;Tile 1x1;3070b;Warm Tan;371;241;#CCA373;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Nougat;18;28;#BB805A;true;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Nougat;18;28;#BB805A;true;0.056
+tile_1x1_square;Tile 1x1;3070b;Nougat;18;28;#BB805A;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Medium Nougat;312;150;#AA7D55;true;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Medium Nougat;312;150;#AA7D55;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Medium Nougat;312;150;#AA7D55;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;Sienna Brown;422;169;#935836;false;0.058
+plate_1x1_round;Plate 1x1 Round;4073;Sienna Brown;422;169;#935836;true;0.053
+tile_1x1_square;Tile 1x1;3070b;Sienna Brown;422;169;#935836;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Dark Orange;38;68;#91501C;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Dark Orange;38;68;#91501C;true;0.041
+tile_1x1_square;Tile 1x1;3070b;Dark Orange;38;68;#91501C;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Neon Orange;;165;#FA5947;true;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Neon Orange;;165;#FA5947;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Neon Orange;;165;#FA5947;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Bright Orange;106;4;#D67923;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Bright Orange;106;4;#D67923;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Bright Orange;106;4;#D67923;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Flame Yellowish Orange;191;110;#FCAC00;true;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Flame Yellowish Orange;191;110;#FCAC00;false;0.047
+tile_1x1_square;Tile 1x1;3070b;Flame Yellowish Orange;191;110;#FCAC00;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Bright Yellow;24;3;#FAC80A;true;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Bright Yellow;24;3;#FAC80A;true;0.056
+tile_1x1_square;Tile 1x1;3070b;Bright Yellow;24;3;#FAC80A;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Cool Yellow;226;103;#FFEC6C;true;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Cool Yellow;226;103;#FFEC6C;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Cool Yellow;226;103;#FFEC6C;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;Vibrant Yellow;368;236;#E6FF00;true;0.058
+plate_1x1_round;Plate 1x1 Round;4073;Vibrant Yellow;368;236;#E6FF00;true;0.053
+tile_1x1_square;Tile 1x1;3070b;Vibrant Yellow;368;236;#E6FF00;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Neon Green;;166;#DBF355;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Neon Green;;166;#DBF355;true;0.041
+tile_1x1_square;Tile 1x1;3070b;Neon Green;;166;#DBF355;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Spring Yellowish Green;326;158;#E2F99A;false;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Spring Yellowish Green;326;158;#E2F99A;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Spring Yellowish Green;326;158;#E2F99A;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Bright Yellowish Green;119;34;#A5CA18;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Bright Yellowish Green;119;34;#A5CA18;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Bright Yellowish Green;119;34;#A5CA18;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Dark Olive Green;;242;#76753F;true;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Dark Olive Green;;242;#76753F;true;0.047
+tile_1x1_square;Tile 1x1;3070b;Dark Olive Green;;242;#76753F;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Olive Green;330;155;#77774E;true;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Olive Green;330;155;#77774E;true;0.056
+tile_1x1_square;Tile 1x1;3070b;Olive Green;330;155;#77774E;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Earth Green;141;80;#00451A;true;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Earth Green;141;80;#00451A;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Earth Green;141;80;#00451A;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;Dark Green;28;6;#00852B;true;0.058
+plate_1x1_round;Plate 1x1 Round;4073;Dark Green;28;6;#00852B;true;0.053
+tile_1x1_square;Tile 1x1;3070b;Dark Green;28;6;#00852B;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Bright Green;37;36;#58AB41;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Bright Green;37;36;#58AB41;false;0.041
+tile_1x1_square;Tile 1x1;3070b;Bright Green;37;36;#58AB41;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Sand Green;151;48;#708E7C;true;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Sand Green;151;48;#708E7C;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Sand Green;151;48;#708E7C;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Bright Bluish Green;107;39;#069D9F;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Bright Bluish Green;107;39;#069D9F;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Bright Bluish Green;107;39;#069D9F;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Aqua;323;152;#D3F2EA;false;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Aqua;323;152;#D3F2EA;true;0.047
+tile_1x1_square;Tile 1x1;3070b;Aqua;323;152;#D3F2EA;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Earth Blue;140;63;#19325A;true;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Earth Blue;140;63;#19325A;true;0.056
+tile_1x1_square;Tile 1x1;3070b;Earth Blue;140;63;#19325A;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Bright Blue;23;7;#1E5AA8;true;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Bright Blue;23;7;#1E5AA8;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Bright Blue;23;7;#1E5AA8;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;Dark Azur;321;153;#469BC3;true;0.058
+plate_1x1_round;Plate 1x1 Round;4073;Dark Azur;321;153;#469BC3;true;0.053
+tile_1x1_square;Tile 1x1;3070b;Dark Azur;321;153;#469BC3;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Medium Azur;322;156;#68C3E2;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Medium Azur;322;156;#68C3E2;true;0.041
+tile_1x1_square;Tile 1x1;3070b;Medium Azur;322;156;#68C3E2;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Medium Blue;102;42;#7396C8;true;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Medium Blue;102;42;#7396C8;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Medium Blue;102;42;#7396C8;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Light Royal Blue;212;105;#9DC3F7;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Light Royal Blue;212;105;#9DC3F7;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Light Royal Blue;212;105;#9DC3F7;true;0.072
+tile_1x1_round;Tile 1x1 Round;98138;Sand Blue;135;55;#70819A;true;0.061
+plate_1x1_round;Plate 1x1 Round;4073;Sand Blue;135;55;#70819A;true;0.047
+tile_1x1_square;Tile 1x1;3070b;Sand Blue;135;55;#70819A;true;0.084
+tile_1x1_round;Tile 1x1 Round;98138;Medium Lilac;268;89;#441A91;true;0.067
+plate_1x1_round;Plate 1x1 Round;4073;Medium Lilac;268;89;#441A91;false;0.056
+tile_1x1_square;Tile 1x1;3070b;Medium Lilac;268;89;#441A91;true;0.075
+tile_1x1_round;Tile 1x1 Round;98138;Medium Lavender;324;157;#A06EB9;false;0.073
+plate_1x1_round;Plate 1x1 Round;4073;Medium Lavender;324;157;#A06EB9;true;0.044
+tile_1x1_square;Tile 1x1;3070b;Medium Lavender;324;157;#A06EB9;true;0.087
+tile_1x1_round;Tile 1x1 Round;98138;Lavender;325;154;#CDA4DE;true;0.058
+plate_1x1_round;Plate 1x1 Round;4073;Lavender;325;154;#CDA4DE;true;0.053
+tile_1x1_square;Tile 1x1;3070b;Lavender;325;154;#CDA4DE;true;0.078
+tile_1x1_round;Tile 1x1 Round;98138;Bright Reddish Violet;124;71;#901F76;true;0.064
+plate_1x1_round;Plate 1x1 Round;4073;Bright Reddish Violet;124;71;#901F76;true;0.041
+tile_1x1_square;Tile 1x1;3070b;Bright Reddish Violet;124;71;#901F76;true;0.090
+tile_1x1_round;Tile 1x1 Round;98138;Bright Purple;221;47;#D3359D;true;0.070
+plate_1x1_round;Plate 1x1 Round;4073;Bright Purple;221;47;#D3359D;true;0.050
+tile_1x1_square;Tile 1x1;3070b;Bright Purple;221;47;#D3359D;true;0.081
+tile_1x1_round;Tile 1x1 Round;98138;Light Purple;222;104;#FF9ECD;true;0.055
+plate_1x1_round;Plate 1x1 Round;4073;Light Purple;222;104;#FF9ECD;true;0.038
+tile_1x1_square;Tile 1x1;3070b;Light Purple;222;104;#FF9ECD;true;0.072

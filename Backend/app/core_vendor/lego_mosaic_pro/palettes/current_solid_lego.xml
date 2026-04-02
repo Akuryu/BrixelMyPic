@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='utf-8'?>
+<palette name="LEGO Current Solid Palette" version="2.0" source="bricklink-active-colors + filtered legacy palette">
+  <metadata>
+    <description>Palette predefinita per mosaici: solo colori solidi marcati come current=true nel file di origine.</description>
+    <notes>Pensata per mosaici 16x16 con tile/stud 1x1. Esclude materiali speciali, transparent, ink e colori storici.</notes>
+  </metadata>
+  <color name="White" rgb="#F4F4F4" material="solid" timeline="1950 - 2024" current="true" lego_id="1" bricklink_id="1" ldraw_id="15" />
+  <color name="Medium Stone Grey" rgb="#969696" material="solid" timeline="2003 - 2024" current="true" lego_id="194" bricklink_id="86" ldraw_id="71">
+    <alias source="bricklink">Light Bluish Gray</alias>
+    <alias source="ldraw">Light Bluish Grey</alias>
+  </color>
+  <color name="Dark Stone Grey" rgb="#646464" material="solid" timeline="2003 - 2024" current="true" lego_id="199" bricklink_id="85" ldraw_id="72">
+    <alias source="bricklink">Dark Bluish Gray</alias>
+    <alias source="ldraw">Dark Bluish Grey</alias>
+  </color>
+  <color name="Black" rgb="#1B2A34" material="solid" timeline="1957 - 2024" current="true" lego_id="26" bricklink_id="11" ldraw_id="0" />
+  <color name="New Dark Red" rgb="#720012" material="solid" timeline="1961 - 2024" current="true" lego_id="154" bricklink_id="59" ldraw_id="320">
+    <alias source="bricklink">Dark Red</alias>
+  </color>
+  <color name="Bright Red" rgb="#B40000" material="solid" timeline="1949 - 2024" current="true" lego_id="21" bricklink_id="5" ldraw_id="4">
+    <alias source="bricklink">Red</alias>
+  </color>
+  <color name="Reddish Orange" rgb="#D14905" material="solid" timeline="2024" current="true" lego_id="402" bricklink_id="167" ldraw_id="402" />
+  <color name="Vibrant Coral" rgb="#FF6666" material="solid" timeline="2019 - 2024" current="true" lego_id="353" bricklink_id="220" ldraw_id="353">
+    <alias source="bricklink">Coral</alias>
+  </color>
+  <color name="Dark Brown" rgb="#372100" material="solid" timeline="2007 - 2024" current="true" lego_id="308" bricklink_id="120" ldraw_id="308" />
+  <color name="Umber Brown" rgb="#543F33" material="solid" timeline="2024" current="true" lego_id="423" bricklink_id="168" ldraw_id="423">
+    <alias source="bricklink">Umber</alias>
+  </color>
+  <color name="Reddish Brown" rgb="#5F3109" material="solid" timeline="2003 - 2024" current="true" lego_id="192" bricklink_id="88" ldraw_id="70" />
+  <color name="Medium Brown" rgb="#755945" material="solid" timeline="2022 - 2024" current="true" lego_id="370" bricklink_id="240" ldraw_id="370" />
+  <color name="Sand Yellow" rgb="#897D62" material="solid" timeline="1961 - 2024" current="true" lego_id="138" bricklink_id="69" ldraw_id="28">
+    <alias source="bricklink">Dark Tan</alias>
+  </color>
+  <color name="Brick Yellow" rgb="#B0A06F" material="solid" timeline="1958 - 2024" current="true" lego_id="5" bricklink_id="2" ldraw_id="19">
+    <alias source="bricklink">Tan</alias>
+  </color>
+  <color name="Light Nougat" rgb="#FFC995" material="solid" timeline="2004 - 2024" current="true" lego_id="283" bricklink_id="90" ldraw_id="78" />
+  <color name="Warm Tan" rgb="#CCA373" material="solid" timeline="2022 - 2024" current="true" lego_id="371" bricklink_id="241" ldraw_id="371">
+    <alias source="bricklink">Medium Tan</alias>
+  </color>
+  <color name="Nougat" rgb="#BB805A" material="solid" timeline="1979 - 2024" current="true" lego_id="18" bricklink_id="28" ldraw_id="92" />
+  <color name="Medium Nougat" rgb="#AA7D55" material="solid" timeline="2010 - 2024" current="true" lego_id="312" bricklink_id="150" ldraw_id="84" />
+  <color name="Sienna Brown" rgb="#935836" material="solid" timeline="2024" current="true" lego_id="422" bricklink_id="169" ldraw_id="422">
+    <alias source="bricklink">Sienna</alias>
+  </color>
+  <color name="Dark Orange" rgb="#91501C" material="solid" timeline="1994 - 2024" current="true" lego_id="38" bricklink_id="68" ldraw_id="484" />
+  <color name="Neon Orange" rgb="#FA5947" material="solid" timeline="?" current="true" bricklink_id="165" />
+  <color name="Bright Orange" rgb="#D67923" material="solid" timeline="1993 - 2024" current="true" lego_id="106" bricklink_id="4" ldraw_id="25">
+    <alias source="bricklink">Orange</alias>
+  </color>
+  <color name="Flame Yellowish Orange" rgb="#FCAC00" material="solid" timeline="2003 - 2024" current="true" lego_id="191" bricklink_id="110" ldraw_id="191">
+    <alias source="bricklink">Bright Light Orange</alias>
+  </color>
+  <color name="Bright Yellow" rgb="#FAC80A" material="solid" timeline="1949 - 2024" current="true" lego_id="24" bricklink_id="3" ldraw_id="14">
+    <alias source="bricklink">Yellow</alias>
+  </color>
+  <color name="Cool Yellow" rgb="#FFEC6C" material="solid" timeline="2004 - 2024" current="true" lego_id="226" bricklink_id="103" ldraw_id="226">
+    <alias source="bricklink">Bright Light Yellow</alias>
+  </color>
+  <color name="Vibrant Yellow" rgb="#E6FF00" material="solid" timeline="2022 - 2024" current="true" lego_id="368" bricklink_id="236" ldraw_id="368">
+    <alias source="bricklink">Neon Yellow</alias>
+  </color>
+  <color name="Neon Green" rgb="#DBF355" material="solid" timeline="?" current="true" bricklink_id="166" />
+  <color name="Spring Yellowish Green" rgb="#E2F99A" material="solid" timeline="2012 - 2024" current="true" lego_id="326" bricklink_id="158" ldraw_id="326">
+    <alias source="bricklink">Yellowish Green</alias>
+  </color>
+  <color name="Bright Yellowish Green" rgb="#A5CA18" material="solid" timeline="1993 - 2024" current="true" lego_id="119" bricklink_id="34" ldraw_id="27">
+    <alias source="bricklink">Lime</alias>
+  </color>
+  <color name="Dark Olive Green" rgb="#76753F" material="solid" timeline="?" current="true" bricklink_id="242" />
+  <color name="Olive Green" rgb="#77774E" material="solid" timeline="2012 - 2024" current="true" lego_id="330" bricklink_id="155" ldraw_id="330" />
+  <color name="Earth Green" rgb="#00451A" material="solid" timeline="1961 - 2024" current="true" lego_id="141" bricklink_id="80" ldraw_id="288">
+    <alias source="bricklink">Dark Green</alias>
+  </color>
+  <color name="Dark Green" rgb="#00852B" material="solid" timeline="1949 - 2024" current="true" lego_id="28" bricklink_id="6" ldraw_id="2">
+    <alias source="bricklink">Green</alias>
+  </color>
+  <color name="Bright Green" rgb="#58AB41" material="solid" timeline="1950 - 2024" current="true" lego_id="37" bricklink_id="36" ldraw_id="10" />
+  <color name="Sand Green" rgb="#708E7C" material="solid" timeline="1964 - 2024" current="true" lego_id="151" bricklink_id="48" ldraw_id="378" />
+  <color name="Bright Bluish Green" rgb="#069D9F" material="solid" timeline="1998 - 2024" current="true" lego_id="107" bricklink_id="39" ldraw_id="3">
+    <alias source="bricklink">Dark Turquoise</alias>
+  </color>
+  <color name="Aqua" rgb="#D3F2EA" material="solid" timeline="2011 - 2024" current="true" lego_id="323" bricklink_id="152" ldraw_id="323">
+    <alias source="bricklink">Light Aqua</alias>
+  </color>
+  <color name="Earth Blue" rgb="#19325A" material="solid" timeline="1961 - 2024" current="true" lego_id="140" bricklink_id="63" ldraw_id="272">
+    <alias source="bricklink">Dark Blue</alias>
+  </color>
+  <color name="Bright Blue" rgb="#1E5AA8" material="solid" timeline="1950 - 2024" current="true" lego_id="23" bricklink_id="7" ldraw_id="1">
+    <alias source="bricklink">Blue</alias>
+  </color>
+  <color name="Dark Azur" rgb="#469BC3" material="solid" timeline="2011 - 2024" current="true" lego_id="321" bricklink_id="153" ldraw_id="321">
+    <alias source="bricklink">Dark Azure</alias>
+  </color>
+  <color name="Medium Azur" rgb="#68C3E2" material="solid" timeline="2012 - 2024" current="true" lego_id="322" bricklink_id="156" ldraw_id="322">
+    <alias source="bricklink">Medium Azure</alias>
+  </color>
+  <color name="Medium Blue" rgb="#7396C8" material="solid" timeline="1949 - 2024" current="true" lego_id="102" bricklink_id="42" ldraw_id="73" />
+  <color name="Light Royal Blue" rgb="#9DC3F7" material="solid" timeline="2004 - 2024" current="true" lego_id="212" bricklink_id="105" ldraw_id="212">
+    <alias source="bricklink">Bright Light Blue</alias>
+  </color>
+  <color name="Sand Blue" rgb="#70819A" material="solid" timeline="2001 - 2024" current="true" lego_id="135" bricklink_id="55" ldraw_id="379" />
+  <color name="Medium Lilac" rgb="#441A91" material="solid" timeline="2003 - 2024" current="true" lego_id="268" bricklink_id="89" ldraw_id="85">
+    <alias source="bricklink">Dark Purple</alias>
+  </color>
+  <color name="Medium Lavender" rgb="#A06EB9" material="solid" timeline="2012 - 2024" current="true" lego_id="324" bricklink_id="157" ldraw_id="30" />
+  <color name="Lavender" rgb="#CDA4DE" material="solid" timeline="2011 - 2024" current="true" lego_id="325" bricklink_id="154" ldraw_id="31" />
+  <color name="Bright Reddish Violet" rgb="#901F76" material="solid" timeline="2000 - 2024" current="true" lego_id="124" bricklink_id="71" ldraw_id="26">
+    <alias source="bricklink">Magenta</alias>
+  </color>
+  <color name="Bright Purple" rgb="#D3359D" material="solid" timeline="1994 - 2024" current="true" lego_id="221" bricklink_id="47" ldraw_id="5">
+    <alias source="bricklink">Dark Pink</alias>
+  </color>
+  <color name="Light Purple" rgb="#FF9ECD" material="solid" timeline="2003 - 2024" current="true" lego_id="222" bricklink_id="104" ldraw_id="29">
+    <alias source="bricklink">Bright Pink</alias>
+  </color>
+</palette>

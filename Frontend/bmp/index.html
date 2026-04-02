@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeoBrick — Brixel my pic!</title>
+  <meta name="description" content="Trasforma le tue foto in mosaici LEGO costruibili con anteprima, istruzioni e download finale." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="site-header glass reveal">
+<a class="brand" href="#top" aria-label="LeoBrick home">
+  <img src="assets/logo.png" alt="LeoBrick" class="brand-logo" />
+  <span class="brand-text gradient-text">Brixel my pic!</span>
+</a>
+
+    <nav class="nav desktop-nav" aria-label="Navigazione principale">
+      <a href="#features">Funzionalità</a>
+      <a href="#workflow">Come funziona</a>
+      <a href="#generator">Genera</a>
+    </nav>
+
+    <button class="menu-button" id="menuButton" aria-expanded="false" aria-controls="mobileMenu" aria-label="Apri menu">☰</button>
+  </header>
+
+  <div class="mobile-menu glass" id="mobileMenu">
+    <a href="#features">Funzionalità</a>
+    <a href="#workflow">Come funziona</a>
+    <a href="#generator">Genera</a>
+  </div>
+
+  <main id="top">
+    <section class="hero section">
+      <div class="hero-copy reveal">
+        <span class="eyebrow">Crea mosaici LEGO da qualsiasi foto</span>
+        <h1>Un flusso <span class="gradient-text">semplice, pulito e veloce</span> per trasformare immagini in costruzioni reali.</h1>
+        <p class="hero-subtitle">Carica una foto, personalizza il risultato e scarica il pacchetto finale con tutto il necessario per iniziare a costruire.</p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary magnetic" href="#generator">Inizia ora</a>
+          <a class="btn btn-secondary" href="#workflow">Scopri il flusso</a>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card glass">
+            <strong>Preview immediata</strong>
+            <span>Upload rapido con feedback visivo</span>
+          </div>
+          <div class="stat-card glass">
+            <strong>Setup intuitivo</strong>
+            <span>Controlli chiari e ben organizzati</span>
+          </div>
+          <div class="stat-card glass">
+            <strong>Download finale</strong>
+            <span>Tutto pronto in un unico ZIP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal delay-1">
+        <div class="dashboard-card glass floating">
+          <div class="dashboard-head">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+
+          <div class="mosaic-preview" id="heroPreview">
+            <div class="pixel-grid" aria-hidden="true"></div>
+          </div>
+
+          <div class="dashboard-metrics">
+            <div>
+              <small>Qualità upload</small>
+              <strong>Live preview</strong>
+            </div>
+            <div>
+              <small>Configurazione</small>
+              <strong>Smart form</strong>
+            </div>
+            <div>
+              <small>Output</small>
+              <strong>ZIP pronto</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="generator" class="section generator-wrap">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Generatore</span>
+        <h2>Carica la foto e genera il tuo mosaico.</h2>
+        <p>Un’interfaccia essenziale, moderna e focalizzata solo su ciò che serve davvero.</p>
+      </div>
+
+      <div class="generator-grid">
+        <div class="upload-panel glass reveal">
+          <label class="dropzone" id="dropzone" for="fileInput">
+            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+
+            <div class="dropzone-shell">
+              <div class="dropzone-icon">⬆</div>
+              <div class="dropzone-copy">
+                <h3>Trascina qui la tua immagine</h3>
+                <p>Oppure clicca per selezionarla dal dispositivo</p>
+              </div>
+              <div class="dropzone-meta">
+                <span class="file-pill">JPG</span>
+                <span class="file-pill">PNG</span>
+                <span class="file-pill">WEBP</span>
+                <span class="file-size">Fino a 15 MB</span>
+              </div>
+            </div>
+          </label>
+
+          <div class="preview-card" id="previewCard" hidden>
+            <div class="preview-head">
+              <div>
+                <span class="preview-label">Anteprima selezionata</span>
+                <strong id="previewName">Immagine pronta</strong>
+              </div>
+              <button class="preview-remove" id="removeImage" type="button">Rimuovi</button>
+            </div>
+            <img id="previewImage" alt="Anteprima immagine caricata" />
+          </div>
+        </div>
+
+        <form class="controls-panel glass reveal delay-1" id="generatorForm">
+          <div class="panel-topbar">
+            <div>
+              <span class="panel-label">Personalizzazione</span>
+              <h3>Parametri di generazione</h3>
+            </div>
+            <span class="panel-badge" id="uploadBadge">Nessun file</span>
+          </div>
+
+          <div class="control-grid">
+            <label class="field">
+              <span>Larghezza finale</span>
+              <input type="number" name="width" min="16" max="512" step="1" value="128" />
+            </label>
+            <label class="field">
+              <span>Altezza finale</span>
+              <input type="number" name="height" min="16" max="512" step="1" value="96" />
+            </label>
+            <label class="field">
+              <span>Tipo pezzo</span>
+              <select name="piece_type">
+                <option value="tile_1x1_square">Tile 1x1 square</option>
+                <option value="tile_1x1_round">Tile 1x1 round</option>
+                <option value="plate_1x1_round">Plate 1x1 round</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Massimo colori</span>
+              <input type="number" name="max_colors" min="2" max="64" step="1" value="12" />
+            </label>
+            <label class="field">
+              <span>Resize mode</span>
+              <select name="resize_mode">
+                <option value="contain">contain</option>
+                <option value="cover">cover</option>
+                <option value="stretch">stretch</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Arrotondamento pannelli</span>
+              <select name="panel_rounding">
+                <option value="nearest">nearest</option>
+                <option value="up">up</option>
+                <option value="down">down</option>
+                <option value="none">none</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" name="dither" checked><span>Dithering</span></label>
+            <label class="toggle"><input type="checkbox" name="generate_pdf" checked><span>PDF istruzioni</span></label>
+            <label class="toggle"><input type="checkbox" name="generate_stud_preview" checked><span>Preview stud</span></label>
+            <label class="toggle"><input type="checkbox" name="piece_aware_palette" checked><span>Solo colori compatibili</span></label>
+          </div>
+
+          <div class="cta-row">
+            <button class="btn btn-primary btn-large magnetic" id="submitButton" type="submit" disabled>
+              <span class="button-label">Genera mosaico</span>
+              <span class="button-loader" aria-hidden="true"></span>
+            </button>
+            <div class="status-text" id="statusText">Carica un’immagine per iniziare.</div>
+          </div>
+
+          <div class="progress" id="progressWrap" hidden aria-hidden="true">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+        </form>
+      </div>
+
+      <div class="result-panel glass reveal" id="resultPanel" hidden>
+        <div class="result-copy">
+          <span class="eyebrow">Output pronto</span>
+          <h3>Il pacchetto è stato generato con successo.</h3>
+          <p id="resultMeta">Troverai immagini, istruzioni e file utili nel pacchetto finale.</p>
+          <div class="result-actions">
+            <a class="btn btn-primary" id="downloadButton" href="#">Scarica ZIP</a>
+            <a class="btn btn-secondary" href="#generator">Crea un altro mosaico</a>
+          </div>
+        </div>
+
+        <div class="result-preview">
+          <div class="result-preview-card">
+            <span class="preview-label">Dettagli generazione</span>
+            <p id="resultPreviewText">Anteprima e dettagli saranno disponibili al termine del processo.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Funzionalità</span>
+        <h2>Un’esperienza più fluida, chiara e premium.</h2>
+        <p>UI pulita, feedback immediati e micro-interazioni leggere per rendere il flusso più piacevole.</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card glass reveal">
+          <div class="feature-icon">✦</div>
+          <h3>Upload moderno</h3>
+          <p>Drag & drop, click per selezione, highlight e anteprima istantanea in un unico blocco.</p>
+        </article>
+        <article class="feature-card glass reveal delay-1">
+          <div class="feature-icon">▦</div>
+          <h3>Controlli ordinati</h3>
+          <p>Impostazioni organizzate in modo leggibile per ridurre attrito e aumentare chiarezza.</p>
+        </article>
+        <article class="feature-card glass reveal delay-2">
+          <div class="feature-icon">⇣</div>
+          <h3>Feedback continuo</h3>
+          <p>Stati visivi, progress bar e pulsanti dinamici accompagnano l’utente fino al download.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="workflow" class="section workflow-section">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Workflow</span>
+        <h2>Dal caricamento al download in 4 passaggi.</h2>
+      </div>
+
+      <div class="steps-grid">
+<div class="step-card glass reveal"><span>01</span><h3>Carica</h3><p>Seleziona o trascina la foto nell’area dedicata.</p></div>
+ <div class="step-card glass reveal delay-1"><span>02</span><h3>Configura</h3><p>Imposta dimensioni, pezzi e preferenze del mosaico.</p></div>
+<div class="step-card glass reveal delay-2"><span>03</span><h3>Genera</h3><p>Avvia il processo con feedback visivo chiaro durante l’elaborazione.</p></div>
+<div class="step-card glass reveal delay-3"><span>04</span> <h3>Ottieni codice</h3><p>Ottieni il codice da condividere con lo staff LeoBrick per poter scaricare il pacchetto finale.</p></div>
+<div class="step-card glass reveal delay-4"><span>05</span><h3>Scarica</h3><p>Inserisci il codice fornito dallo staff di LeoBrick e scarica il pacchetto finale.</p></div>
+</div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
