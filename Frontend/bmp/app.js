@@ -38,6 +38,86 @@ let generatedCode = null;
 
 /* ------------------ HELPERS ------------------ */
 
+async function normalizeImageForUpload(file) {
+  const bitmap = await createImageBitmap(file);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+
+  const ctx = canvas.getContext('2d', { alpha: false });
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bitmap, 0, 0);
+
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((b) => {
+      if (!b) {
+        reject(new Error('Impossibile normalizzare l’immagine.'));
+        return;
+      }
+      resolve(b);
+    }, 'image/png');
+  });
+
+  return new File(
+    [blob],
+    file.name.replace(/\.[^.]+$/, '') + '.png',
+    {
+      type: 'image/png',
+      lastModified: Date.now()
+    }
+  );
+}
+
+async function apiFetch(url, options = {}, label = 'request') {
+  const startedAt = performance.now();
+
+  try {
+    const response = await fetch(url, options);
+
+    console.group(`[API ${label}]`);
+    console.log('URL:', url);
+    console.log('Method:', options.method || 'GET');
+
+    if (options.body instanceof FormData) {
+      const file = options.body.get('file');
+      if (file) {
+        console.log('File:', {
+          name: file.name,
+          type: file.type,
+          size: file.size
+        });
+      }
+
+      const entries = {};
+      for (const [key, value] of options.body.entries()) {
+        if (key !== 'file') entries[key] = value;
+      }
+      console.log('Form fields:', entries);
+    }
+
+    console.log('Status:', response.status);
+    console.log('Elapsed ms:', Math.round(performance.now() - startedAt));
+    console.groupEnd();
+
+    return response;
+  } catch (error) {
+    console.group(`[API ${label}]`);
+    console.error('NETWORK ERROR', {
+      url,
+      method: options.method || 'GET',
+      message: error?.message,
+      name: error?.name,
+      online: navigator.onLine,
+      elapsedMs: Math.round(performance.now() - startedAt)
+    });
+    console.groupEnd();
+    throw error;
+  }
+}
+
 async function downloadPackage(token) {
   try {
     const response = await fetch(`${apiBase}/api/redeem`, {
@@ -115,24 +195,30 @@ function setLoadingState(isLoading) {
 
 /* ------------------ FILE ------------------ */
 
-function setPreview(file) {
-  currentFile = file;
+async function setPreview(file) {
+  try {
+    const normalizedFile = await normalizeImageForUpload(file);
+    currentFile = normalizedFile;
 
-  if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
-  if (remotePreviewUrl) {
-    URL.revokeObjectURL(remotePreviewUrl);
-    remotePreviewUrl = null;
+    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+    if (remotePreviewUrl) {
+      URL.revokeObjectURL(remotePreviewUrl);
+      remotePreviewUrl = null;
+    }
+
+    previewObjectUrl = URL.createObjectURL(normalizedFile);
+    previewImage.src = previewObjectUrl;
+    previewName.textContent = file.name;
+
+    previewCard.hidden = false;
+    dropzone.classList.add('has-file');
+
+    setStatus(`${file.name} selezionato.`);
+    updateSubmitState();
+  } catch (error) {
+    console.error('Errore durante la normalizzazione del file:', error);
+    setStatus(error.message || 'Errore nella preparazione dell’immagine.');
   }
-
-  previewObjectUrl = URL.createObjectURL(file);
-  previewImage.src = previewObjectUrl;
-  previewName.textContent = file.name;
-
-  previewCard.hidden = false;
-  dropzone.classList.add('has-file');
-
-  setStatus(`${file.name} selezionato.`);
-  updateSubmitState();
 }
 
 function resetPreview() {
@@ -199,10 +285,10 @@ function collectFormData() {
 async function loadRemotePreview() {
   const formData = collectFormData();
 
-  const response = await fetch(`${apiBase}/api/preview`, {
+  const response = await apiFetch(`${apiBase}/api/preview`, {
     method: 'POST',
     body: formData
-  });
+  }, 'preview');
 
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
@@ -250,10 +336,10 @@ generatorForm.addEventListener('submit', async (event) => {
   resultPanel.hidden = true;
 
   try {
-    const res = await fetch(`${apiBase}/api/prepare-package`, {
+    const res = await apiFetch(`${apiBase}/api/prepare-package`, {
       method: 'POST',
       body: formData
-    });
+    }, 'prepare-package');
 
     if (!res.ok) {
       const payload = await res.json().catch(() => ({}));

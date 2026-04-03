@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import io
 import logging
+import time
+import uuid
 from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
@@ -47,6 +49,46 @@ app.add_middleware(
 )
 
 storage = Storage()
+
+
+# ================== 🆕 REQUEST LOGGING ==================
+
+@app.middleware("http")
+async def request_logging_middleware(request: Request, call_next):
+    request_id = uuid.uuid4().hex[:10]
+    start = time.perf_counter()
+
+    logger.info(
+        "➡️ %s %s rid=%s content_length=%s content_type=%s origin=%s",
+        request.method,
+        request.url.path,
+        request_id,
+        request.headers.get("content-length"),
+        request.headers.get("content-type"),
+        request.headers.get("origin"),
+    )
+
+    try:
+        response = await call_next(request)
+    except Exception:
+        elapsed = int((time.perf_counter() - start) * 1000)
+        logger.exception("💥 Crash request rid=%s elapsed_ms=%s", request_id, elapsed)
+        raise
+
+    elapsed = int((time.perf_counter() - start) * 1000)
+
+    response.headers["X-Request-ID"] = request_id
+
+    logger.info(
+        "⬅️ %s %s rid=%s status=%s elapsed_ms=%s",
+        request.method,
+        request.url.path,
+        request_id,
+        response.status_code,
+        elapsed,
+    )
+
+    return response
 
 
 # ------------------ HELPERS ------------------
@@ -106,9 +148,6 @@ async def _read_image(file: UploadFile) -> bytes:
             sorted(list(img.info.keys())),
         )
 
-        # Fix importante per PNG/loghi con trasparenza:
-        # appiattiamo su sfondo bianco invece di fare solo convert("RGB"),
-        # così evitiamo che i pixel trasparenti neri influenzino la pipeline.
         if img.mode in ("RGBA", "LA") or ("transparency" in img.info):
             background = Image.new("RGBA", img.size, (255, 255, 255, 255))
             img = Image.alpha_composite(background, img.convert("RGBA")).convert("RGB")
