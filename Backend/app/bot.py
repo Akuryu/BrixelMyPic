@@ -121,14 +121,15 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ------------------ START BOT ------------------
 
-def start_bot():
-    logger.info("Avvio bot Telegram...")
+async def start_bot_async():
+    logger.info("Avvio bot Telegram (async)...")
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT, handle))
 
-    logger.info("🤖 Bot Telegram avviato")
+    logger.info("🤖 Bot Telegram pronto")
 
-    app.run_polling()
+    # questo gestisce tutto internamente
+    await app.run_polling()
