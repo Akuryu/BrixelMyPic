@@ -20,6 +20,8 @@ storage = Storage()
 def confirm_payment_internal(code: str):
     meta_path = storage.metadata_path(code)
 
+    print("DEBUG PATH:", meta_path)   # 👈 AGGIUNGI QUESTO
+
     if not meta_path.exists():
         raise Exception("Codice non trovato")
 
