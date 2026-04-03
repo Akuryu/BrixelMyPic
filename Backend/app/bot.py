@@ -1,3 +1,6 @@
+import logging
+import os
+
 from app.settings import settings
 from app.storage import Storage
 from app.utils import generate_redeem_token
@@ -5,9 +8,18 @@ from app.utils import generate_redeem_token
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, ContextTypes, filters
 
-import logging
+
+# ------------------ LOGGING ------------------
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s"
+)
 
 logger = logging.getLogger("leobrick.bot")
+
+
+# ------------------ CONFIG ------------------
 
 BOT_TOKEN = settings.telegram_bot_token
 ALLOWED_USERS = set(settings.telegram_allowed_users)
@@ -20,14 +32,25 @@ storage = Storage()
 def confirm_payment_internal(code: str):
     meta_path = storage.metadata_path(code)
 
-    print("DEBUG PATH:", meta_path)
+    logger.info("Checking path: %s", meta_path)
 
     if not meta_path.exists():
-        raise Exception(f"Codice non trovato: {meta_path}")
+        # DEBUG: vediamo cosa c'è nella cartella parent
+        parent = meta_path.parent
+        if parent.exists():
+            logger.info("Contenuto directory %s: %s", parent, os.listdir(parent))
+        else:
+            logger.warning("Directory parent NON esiste: %s", parent)
+
+        logger.error("Codice non trovato: %s", meta_path)
+        raise Exception(f"Codice non trovato: {code}")
 
     metadata = storage.load_metadata(code)
 
+    logger.info("Metadata caricati: %s", metadata)
+
     if metadata.get("status") == "paid" and metadata.get("redeem_token"):
+        logger.info("Token già esistente per %s", code)
         return metadata["redeem_token"]
 
     token = generate_redeem_token()
@@ -45,55 +68,62 @@ def confirm_payment_internal(code: str):
 # ------------------ HANDLERS ------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Comando /start ricevuto")
+
     await update.message.reply_text(
         "🤖 LeoBrick Bot attivo\n\nInvia un codice LEO-XXXX"
     )
 
 
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("UPDATE RAW:", update)
+    logger.info("UPDATE ricevuto")
 
     if not update.message:
-        print("NO MESSAGE")
+        logger.warning("NO MESSAGE")
         return
 
     if not update.message.text:
-        print("NO TEXT")
+        logger.warning("NO TEXT")
         return
 
     user_id = update.effective_user.id
-    print("USER:", user_id)
+    logger.info("USER: %s", user_id)
 
-    text = update.message.text.strip().upper()
-    print("TEXT:", text)
+    text = update.message.text.strip()  # 👈 niente .upper() per ora (debug!)
+    logger.info("TEXT ricevuto: %s", text)
 
     if user_id not in ALLOWED_USERS:
-        print("NOT ALLOWED")
+        logger.warning("USER NON AUTORIZZATO: %s", user_id)
         return
 
-    if not text.startswith("LEO-"):
+    if not text.upper().startswith("LEO-"):
         await update.message.reply_text("❌ Inserisci un codice valido (LEO-XXXX)")
         return
+
+    code = text.strip()  # manteniamo originale
+    logger.info("Codice processato: %s", code)
 
     msg = await update.message.reply_text("⏳ Genero token...")
 
     try:
-        token = confirm_payment_internal(text)
+        token = confirm_payment_internal(code)
 
         await msg.edit_text(
             f"✅ TOKEN GENERATO\n\n"
-            f"Codice: {text}\n"
+            f"Codice: {code}\n"
             f"RDM:\n{token}"
         )
 
     except Exception as e:
-        print("ERROR:", str(e))
+        logger.error("Errore: %s", str(e))
         await msg.edit_text(f"❌ Errore: {str(e)}")
 
 
 # ------------------ START BOT ------------------
 
-async def start_bot_async():
+def start_bot():
+    logger.info("Avvio bot Telegram...")
+
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -101,6 +131,4 @@ async def start_bot_async():
 
     logger.info("🤖 Bot Telegram avviato")
 
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+    app.run_polling()
