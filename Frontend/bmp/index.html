@@ -15,15 +15,16 @@
   <div class="bg-orb orb-2"></div>
 
   <header class="site-header glass reveal">
-<a class="brand" href="#top" aria-label="LeoBrick home">
-  <img src="assets/logo.png" alt="LeoBrick" class="brand-logo" />
-  <span class="brand-text gradient-text">Brixel my pic!</span>
-</a>
+    <a class="brand" href="#top" aria-label="LeoBrick home">
+      <img src="assets/logo.png" alt="LeoBrick" class="brand-logo" />
+      <span class="brand-text gradient-text">Brixel my pic!</span>
+    </a>
 
     <nav class="nav desktop-nav" aria-label="Navigazione principale">
       <a href="#features">Funzionalità</a>
       <a href="#workflow">Come funziona</a>
       <a href="#generator">Genera</a>
+      <a href="#redeem-section">Recupera</a>
     </nav>
 
     <button class="menu-button" id="menuButton" aria-expanded="false" aria-controls="mobileMenu" aria-label="Apri menu">☰</button>
@@ -33,6 +34,7 @@
     <a href="#features">Funzionalità</a>
     <a href="#workflow">Come funziona</a>
     <a href="#generator">Genera</a>
+    <a href="#redeem-section">Recupera</a>
   </div>
 
   <main id="top">
@@ -40,7 +42,7 @@
       <div class="hero-copy reveal">
         <span class="eyebrow">Crea mosaici LEGO da qualsiasi foto</span>
         <h1>Un flusso <span class="gradient-text">semplice, pulito e veloce</span> per trasformare immagini in costruzioni reali.</h1>
-        <p class="hero-subtitle">Carica una foto, personalizza il risultato e scarica il pacchetto finale con tutto il necessario per iniziare a costruire.</p>
+        <p class="hero-subtitle">Carica una foto, personalizza il risultato e genera un codice pubblico. Il download si sblocca solo dopo pagamento e redeem.</p>
 
         <div class="hero-actions">
           <a class="btn btn-primary magnetic" href="#generator">Inizia ora</a>
@@ -53,12 +55,12 @@
             <span>Upload rapido con feedback visivo</span>
           </div>
           <div class="stat-card glass">
-            <strong>Setup intuitivo</strong>
-            <span>Controlli chiari e ben organizzati</span>
+            <strong>Codice pubblico</strong>
+            <span>Generazione separata dal pagamento</span>
           </div>
           <div class="stat-card glass">
-            <strong>Download finale</strong>
-            <span>Tutto pronto in un unico ZIP</span>
+            <strong>Download protetto</strong>
+            <span>Disponibile solo con redeem token</span>
           </div>
         </div>
       </div>
@@ -81,12 +83,12 @@
               <strong>Live preview</strong>
             </div>
             <div>
-              <small>Configurazione</small>
-              <strong>Smart form</strong>
+              <small>Generazione</small>
+              <strong>Codice LEO</strong>
             </div>
             <div>
               <small>Output</small>
-              <strong>ZIP pronto</strong>
+              <strong>Redeem ZIP</strong>
             </div>
           </div>
         </div>
@@ -96,8 +98,8 @@
     <section id="generator" class="section generator-wrap">
       <div class="section-heading reveal">
         <span class="eyebrow">Generatore</span>
-        <h2>Carica la foto e genera il tuo mosaico.</h2>
-        <p>Un’interfaccia essenziale, moderna e focalizzata solo su ciò che serve davvero.</p>
+        <h2>Carica la foto e prepara il tuo mosaico.</h2>
+        <p>Anteprima e generazione codice sono separate, così il pagamento non sblocca nulla automaticamente.</p>
       </div>
 
       <div class="generator-grid">
@@ -189,10 +191,15 @@
           </div>
 
           <div class="cta-row">
+            <button class="btn btn-secondary btn-large magnetic" id="previewButton" type="button" disabled>
+              <span class="button-label">Anteprima</span>
+            </button>
+
             <button class="btn btn-primary btn-large magnetic" id="submitButton" type="submit" disabled>
-              <span class="button-label">Genera mosaico</span>
+              <span class="button-label">Genera codice</span>
               <span class="button-loader" aria-hidden="true"></span>
             </button>
+
             <div class="status-text" id="statusText">Carica un’immagine per iniziare.</div>
           </div>
 
@@ -204,11 +211,43 @@
 
       <div class="result-panel glass reveal" id="resultPanel" hidden>
         <div class="result-copy">
-          <span class="eyebrow">Output pronto</span>
-          <h3>Il pacchetto è stato generato con successo.</h3>
-          <p id="resultMeta">Troverai immagini, istruzioni e file utili nel pacchetto finale.</p>
+          <span class="eyebrow">Codice generato</span>
+          <h3>Il pacchetto è stato preparato.</h3>
+          <p id="resultMeta">Il tuo codice pubblico apparirà qui sotto.</p>
+
+          <div class="public-code-block">
+            <span class="preview-label">Codice pubblico</span>
+            <div class="public-code-row">
+              <input
+                id="publicCodeField"
+                class="public-code-field"
+                type="text"
+                readonly
+                value=""
+                aria-label="Codice pubblico generato"
+              />
+              <button class="btn btn-secondary" id="copyCodeButton" type="button">Copia</button>
+            </div>
+            <p class="public-code-help" id="publicCodeHelp">
+  Usa questo codice per pagare con PayPal oppure invialo allo staff per ottenere il codice di sblocco.
+</p>
+          </div>
+
+          <!-- SOLO QUESTA PARTE CAMBIA -->
+
+<div class="paypal-panel" id="paypalSection" hidden>
+  <span class="preview-label">Pagamento</span>
+
+  <p id="paypalStatusText">
+    Paga con PayPal per scaricare automaticamente il pacchetto.
+    <br><br>
+    Se paghi manualmente, riceverai un codice RDM dallo staff da inserire qui sotto.
+  </p>
+
+  <div id="paypalButtonsContainer"></div>
+</div>
+
           <div class="result-actions">
-            <a class="btn btn-primary" id="downloadButton" href="#">Scarica ZIP</a>
             <a class="btn btn-secondary" href="#generator">Crea un altro mosaico</a>
           </div>
         </div>
@@ -218,6 +257,28 @@
             <span class="preview-label">Dettagli generazione</span>
             <p id="resultPreviewText">Anteprima e dettagli saranno disponibili al termine del processo.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="redeem-section" class="section">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Recupero pacchetto</span>
+        <h2>Hai già un codice?</h2>
+        <p>Inserisci un codice pubblico LEO oppure un token RDM per recuperare il pacchetto finale.</p>
+      </div>
+
+      <div class="glass reveal" style="padding: 28px;">
+        <div class="control-grid">
+          <label class="field" style="grid-column: 1 / -1;">
+            <span>Codice o token</span>
+            <input id="redeemInput" type="text" placeholder="Inserisci codice o token" autocomplete="off" />
+          </label>
+        </div>
+
+        <div class="cta-row">
+          <button class="btn btn-primary btn-large" id="redeemButton" type="button">Recupera pacchetto</button>
+          <div class="status-text" id="redeemStatusText">Se hai un token RDM puoi scaricare subito il file ZIP.</div>
         </div>
       </div>
     </section>
@@ -242,8 +303,8 @@
         </article>
         <article class="feature-card glass reveal delay-2">
           <div class="feature-icon">⇣</div>
-          <h3>Feedback continuo</h3>
-          <p>Stati visivi, progress bar e pulsanti dinamici accompagnano l’utente fino al download.</p>
+          <h3>Flusso protetto</h3>
+          <p>Preview, codice, pagamento e redeem sono separati per evitare download immediati non autorizzati.</p>
         </article>
       </div>
     </section>
@@ -251,20 +312,21 @@
     <section id="workflow" class="section workflow-section">
       <div class="section-heading reveal">
         <span class="eyebrow">Workflow</span>
-        <h2>Dal caricamento al download in 4 passaggi.</h2>
+        <h2>Dal caricamento al download in 5 passaggi.</h2>
       </div>
 
       <div class="steps-grid">
-<div class="step-card glass reveal"><span>01</span><h3>Carica</h3><p>Seleziona o trascina la foto nell’area dedicata.</p></div>
- <div class="step-card glass reveal delay-1"><span>02</span><h3>Configura</h3><p>Imposta dimensioni, pezzi e preferenze del mosaico.</p></div>
-<div class="step-card glass reveal delay-2"><span>03</span><h3>Genera</h3><p>Avvia il processo con feedback visivo chiaro durante l’elaborazione.</p></div>
-<div class="step-card glass reveal delay-3"><span>04</span> <h3>Ottieni codice</h3><p>Ottieni il codice da condividere con lo staff LeoBrick per poter scaricare il pacchetto finale.</p></div>
-<div class="step-card glass reveal delay-4"><span>05</span><h3>Scarica</h3><p>Inserisci il codice fornito dallo staff di LeoBrick e scarica il pacchetto finale.</p></div>
-</div>
+        <div class="step-card glass reveal"><span>01</span><h3>Carica</h3><p>Seleziona o trascina la foto nell’area dedicata.</p></div>
+        <div class="step-card glass reveal delay-1"><span>02</span><h3>Anteprima</h3><p>Genera la preview usando i parametri correnti senza preparare il pacchetto.</p></div>
+        <div class="step-card glass reveal delay-2"><span>03</span><h3>Genera codice</h3><p>Prepara il pacchetto e ottieni un codice pubblico LEO da mostrare all’utente.</p></div>
+        <div class="step-card glass reveal delay-3"><span>04</span><h3>Paga</h3><p>Completa il pagamento PayPal per confermare il codice e ottenere il token RDM.</p></div>
+        <div class="step-card glass reveal delay-4"><span>05</span><h3>Redeem</h3><p>Inserisci il redeem token e scarica il pacchetto finale solo quando è realmente sbloccato.</p></div>
+      </div>
     </section>
   </main>
 
   <script src="config.js"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AWaPZJJiMaHRpeBwQobgWWpIkp7sv4q3dBz9sn_2RhuwZInzWL52VclbVO6heW1776HRajdHjVM9eqCC&currency=EUR&intent=capture"></script>
   <script src="app.js"></script>
 </body>
 </html>

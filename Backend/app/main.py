@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import logging
@@ -25,6 +24,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 storage = Storage()
 
 
@@ -110,9 +110,12 @@ async def prepare_package(
 ):
     image_bytes = await _read_image(file)
     params = _collect_form_params(locals())
+
     code = generate_public_code()
     job_dir = storage.ensure_job_dir(code)
+
     package_meta = generate_package_from_bytes(image_bytes, params, job_dir)
+
     metadata = {
         "public_code": code,
         "redeem_token": None,
@@ -125,24 +128,37 @@ async def prepare_package(
         "created_at": utc_timestamp(),
         "files": package_meta["files"],
     }
+
     storage.save_metadata(code, metadata)
     logger.info("Package pronto per %s", code)
+
     return PreparePackageResponse(code=code)
 
 
+# 🔒 PROTEZIONE AGGIUNTA QUI
 @app.post("/api/confirm-payment", response_model=ConfirmPaymentResponse)
-def confirm_payment(payload: PaymentConfirmRequest):
+def confirm_payment(payload: PaymentConfirmRequest, request: Request):
+    api_key = request.headers.get("X-API-KEY")
+
+    if api_key != settings.internal_api_key:
+        raise _error(403, "Unauthorized")
+
     meta_path = storage.metadata_path(payload.code)
     if not meta_path.exists():
         raise _error(404, "Codice non trovato")
+
     metadata = storage.load_metadata(payload.code)
+
     if metadata.get("status") == "paid" and metadata.get("redeem_token"):
         return ConfirmPaymentResponse(redeem_token=metadata["redeem_token"], status="paid")
+
     token = generate_redeem_token()
     metadata["redeem_token"] = token
     metadata["status"] = "paid"
+
     storage.save_metadata(payload.code, metadata)
     logger.info("Pagamento confermato per %s", payload.code)
+
     return ConfirmPaymentResponse(redeem_token=token)
 
 
@@ -151,9 +167,11 @@ def redeem(payload: RedeemRequest):
     code, metadata = storage.find_by_token(payload.token)
     if not code or metadata.get("status") != "paid":
         raise _error(403, "Token non valido")
+
     zip_path = storage.zip_path(code)
     if not zip_path.exists():
         raise _error(404, "Pacchetto non trovato")
+
     return FileResponse(zip_path, media_type="application/zip", filename=f"{code}.zip")
 
 
@@ -173,9 +191,12 @@ async def generate_compat(
 ):
     image_bytes = await _read_image(file)
     params = _collect_form_params(locals())
+
     code = generate_public_code()
     job_dir = storage.ensure_job_dir(code)
+
     package_meta = generate_package_from_bytes(image_bytes, params, job_dir)
+
     metadata = {
         "public_code": code,
         "redeem_token": None,
@@ -188,7 +209,9 @@ async def generate_compat(
         "created_at": utc_timestamp(),
         "files": package_meta["files"],
     }
+
     storage.save_metadata(code, metadata)
+
     return {
         "job_id": code,
         "download_url": f"/api/download/{code}",
@@ -204,4 +227,16 @@ def download(public_code: str):
     zip_path = storage.zip_path(public_code)
     if not zip_path.exists():
         raise _error(404, "Pacchetto non trovato")
+
     return FileResponse(zip_path, media_type="application/zip", filename=f"{public_code}.zip")
+
+
+# 🚀 AVVIO BOT MIGLIORATO
+import threading
+from app.bot import start_bot
+
+def start_background_bot():
+    thread = threading.Thread(target=start_bot, daemon=True)
+    thread.start()
+
+start_background_bot()

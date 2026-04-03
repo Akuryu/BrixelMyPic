@@ -1,1 +1,1 @@
-window.LEOBRICK_API_BASE = 'https://api.tuodominio.it';
+window.LEOBRICK_API_BASE = "https://api.leobrick.com";
