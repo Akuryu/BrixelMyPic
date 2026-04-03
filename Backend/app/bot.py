@@ -1,6 +1,5 @@
 import logging
 import os
-import asyncio
 
 from app.settings import settings
 from app.storage import Storage
@@ -36,8 +35,8 @@ def confirm_payment_internal(code: str):
     logger.info("Checking path: %s", meta_path)
 
     if not meta_path.exists():
-        # DEBUG: vediamo cosa c'è nella cartella parent
         parent = meta_path.parent
+
         if parent.exists():
             logger.info("Contenuto directory %s: %s", parent, os.listdir(parent))
         else:
@@ -47,7 +46,6 @@ def confirm_payment_internal(code: str):
         raise Exception(f"Codice non trovato: {code}")
 
     metadata = storage.load_metadata(code)
-
     logger.info("Metadata caricati: %s", metadata)
 
     if metadata.get("status") == "paid" and metadata.get("redeem_token"):
@@ -90,7 +88,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     logger.info("USER: %s", user_id)
 
-    text = update.message.text.strip()  # 👈 niente .upper() per ora (debug!)
+    text = update.message.text.strip()
     logger.info("TEXT ricevuto: %s", text)
 
     if user_id not in ALLOWED_USERS:
@@ -101,7 +99,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Inserisci un codice valido (LEO-XXXX)")
         return
 
-    code = text.strip()  # manteniamo originale
+    code = text.strip()
     logger.info("Codice processato: %s", code)
 
     msg = await update.message.reply_text("⏳ Genero token...")
@@ -122,15 +120,14 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ------------------ START BOT ------------------
 
-async def start_bot_async():
-    logger.info("Avvio bot Telegram (async)...")
+def start_bot():
+    logger.info("Avvio bot Telegram...")
 
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT, handle))
 
-    logger.info("🤖 Bot Telegram pronto")
+    logger.info("🤖 Bot Telegram avviato")
 
-    # 👇 trucco: esegue run_polling in thread separato
-    await asyncio.to_thread(application.run_polling)
+    application.run_polling()
