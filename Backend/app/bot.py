@@ -20,10 +20,10 @@ storage = Storage()
 def confirm_payment_internal(code: str):
     meta_path = storage.metadata_path(code)
 
-    print("DEBUG PATH:", meta_path)   # 👈 AGGIUNGI QUESTO
+    print("DEBUG PATH:", meta_path)
 
     if not meta_path.exists():
-        raise Exception("Codice non trovato")
+        raise Exception(f"Codice non trovato: {meta_path}")
 
     metadata = storage.load_metadata(code)
 
@@ -44,8 +44,14 @@ def confirm_payment_internal(code: str):
 
 # ------------------ HANDLERS ------------------
 
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "🤖 LeoBrick Bot attivo\n\nInvia un codice LEO-XXXX"
+    )
+
+
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("UPDATE RAW:", update)   # 👈 DEBUG FORZATO
+    print("UPDATE RAW:", update)
 
     if not update.message:
         print("NO MESSAGE")
@@ -85,9 +91,9 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await msg.edit_text(f"❌ Errore: {str(e)}")
 
 
-# ------------------ START BOT (ASYNC SAFE) ------------------
+# ------------------ START BOT ------------------
 
-async def start_bot_async():
+def start_bot():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -95,6 +101,4 @@ async def start_bot_async():
 
     logger.info("🤖 Bot Telegram avviato")
 
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+    app.run_polling()
