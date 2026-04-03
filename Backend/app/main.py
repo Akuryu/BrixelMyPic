@@ -1,17 +1,25 @@
 from __future__ import annotations
 
-import logging
 import io
-from pathlib import Path
+import logging
 from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
-from starlette.middleware.cors import CORSMiddleware
 from PIL import Image, UnidentifiedImageError
+from starlette.middleware.cors import CORSMiddleware
 
-from .schemas import ConfirmPaymentResponse, PaymentConfirmRequest, PreparePackageResponse, RedeemRequest
-from .services.core_adapter import generate_package_from_bytes, generate_preview_from_bytes, normalize_params
+from .schemas import (
+    ConfirmPaymentResponse,
+    PaymentConfirmRequest,
+    PreparePackageResponse,
+    RedeemRequest,
+)
+from .services.core_adapter import (
+    generate_package_from_bytes,
+    generate_preview_from_bytes,
+    normalize_params,
+)
 from .settings import settings
 from .storage import Storage
 from .utils import generate_public_code, generate_redeem_token, utc_timestamp
@@ -21,7 +29,7 @@ from .utils import generate_public_code, generate_redeem_token, utc_timestamp
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s %(message)s"
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 
 logger = logging.getLogger("leobrick")
@@ -47,14 +55,35 @@ def _error(status_code: int, detail: str) -> HTTPException:
     return HTTPException(status_code=status_code, detail=detail)
 
 
+def _safe_params_for_log(params: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "width": params.get("width"),
+        "height": params.get("height"),
+        "piece_type": params.get("piece_type"),
+        "max_colors": params.get("max_colors"),
+        "resize_mode": params.get("resize_mode"),
+        "panel_rounding": params.get("panel_rounding"),
+        "dither": params.get("dither"),
+        "generate_pdf": params.get("generate_pdf"),
+        "generate_stud_preview": params.get("generate_stud_preview"),
+        "piece_aware_palette": params.get("piece_aware_palette"),
+    }
+
+
 async def _read_image(file: UploadFile) -> bytes:
     if not file.filename:
         raise _error(400, "File immagine mancante.")
 
+    original_content_type = (file.content_type or "").lower()
     image_bytes = await file.read()
     await file.seek(0)
 
-    logger.info("📥 Upload ricevuto: %s (%d bytes)", file.filename, len(image_bytes))
+    logger.info(
+        "📥 Upload ricevuto: filename=%s content_type=%s bytes=%d",
+        file.filename,
+        original_content_type,
+        len(image_bytes),
+    )
 
     if not image_bytes:
         raise _error(400, "Il file caricato è vuoto.")
@@ -67,28 +96,46 @@ async def _read_image(file: UploadFile) -> bytes:
 
     try:
         img = Image.open(io.BytesIO(image_bytes))
-
-        # 🔥 forza decoding completo (fix PNG strani)
         img.load()
 
-        logger.info("🖼️ Immagine aperta: mode=%s size=%s", img.mode, img.size)
+        logger.info(
+            "🖼️ Immagine aperta: format=%s mode=%s size=%s info_keys=%s",
+            img.format,
+            img.mode,
+            img.size,
+            sorted(list(img.info.keys())),
+        )
 
-        # 🔥 normalizzazione robusta
-        if img.mode not in ("RGB", "L"):
-            img = img.convert("RGB")
-            logger.info("🔧 Convertita in RGB")
+        # Fix importante per PNG/loghi con trasparenza:
+        # appiattiamo su sfondo bianco invece di fare solo convert("RGB"),
+        # così evitiamo che i pixel trasparenti neri influenzino la pipeline.
+        if img.mode in ("RGBA", "LA") or ("transparency" in img.info):
+            background = Image.new("RGBA", img.size, (255, 255, 255, 255))
+            img = Image.alpha_composite(background, img.convert("RGBA")).convert("RGB")
+            logger.info("🎨 Trasparenza appiattita su sfondo bianco")
+        else:
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+                logger.info("🔧 Convertita in RGB")
 
         buffer = io.BytesIO()
         img.save(buffer, format="PNG", optimize=True)
+        normalized_bytes = buffer.getvalue()
 
-        return buffer.getvalue()
+        logger.info(
+            "✅ Immagine normalizzata: output_bytes=%d mode=%s size=%s",
+            len(normalized_bytes),
+            img.mode,
+            img.size,
+        )
+
+        return normalized_bytes
 
     except UnidentifiedImageError:
         logger.error("❌ Formato immagine non riconosciuto: %s", file.filename)
         raise _error(400, "Formato immagine non riconosciuto.")
-
-    except Exception as e:
-        logger.exception("❌ Errore processing immagine")
+    except Exception:
+        logger.exception("❌ Errore processing immagine: filename=%s", file.filename)
         raise _error(400, "Immagine non valida o corrotta.")
 
 
@@ -144,9 +191,21 @@ async def preview(
     image_bytes = await _read_image(file)
     params = _collect_form_params(locals())
 
-    preview_bytes, _meta = generate_preview_from_bytes(image_bytes, params)
+    logger.info("🧩 Parametri preview: %s", _safe_params_for_log(params))
 
-    logger.info("✅ Preview generata")
+    try:
+        preview_bytes, meta = generate_preview_from_bytes(image_bytes, params)
+        logger.info(
+            "✅ Preview generata: preview_bytes=%d meta=%s",
+            len(preview_bytes),
+            meta,
+        )
+    except Exception:
+        logger.exception(
+            "💥 Errore in generate_preview_from_bytes con params=%s",
+            _safe_params_for_log(params),
+        )
+        raise _error(500, "Errore durante la generazione della preview.")
 
     return Response(content=preview_bytes, media_type="image/png")
 
@@ -170,12 +229,24 @@ async def prepare_package(
     image_bytes = await _read_image(file)
     params = _collect_form_params(locals())
 
+    logger.info("🧩 Parametri package: %s", _safe_params_for_log(params))
+
     code = generate_public_code()
     job_dir = storage.ensure_job_dir(code)
 
-    logger.info("📁 Job dir: %s", job_dir)
+    logger.info("📁 Job dir creato/trovato: code=%s dir=%s", code, job_dir)
 
-    package_meta = generate_package_from_bytes(image_bytes, params, job_dir)
+    try:
+        package_meta = generate_package_from_bytes(image_bytes, params, job_dir)
+        logger.info("✅ Package generato: code=%s meta=%s", code, package_meta)
+    except Exception:
+        logger.exception(
+            "💥 Errore in generate_package_from_bytes: code=%s dir=%s params=%s",
+            code,
+            job_dir,
+            _safe_params_for_log(params),
+        )
+        raise _error(500, "Errore durante la generazione del pacchetto.")
 
     metadata = {
         "public_code": code,
@@ -190,7 +261,12 @@ async def prepare_package(
         "files": package_meta["files"],
     }
 
-    storage.save_metadata(code, metadata)
+    try:
+        storage.save_metadata(code, metadata)
+        logger.info("💾 Metadata salvati: code=%s", code)
+    except Exception:
+        logger.exception("💥 Errore salvataggio metadata: code=%s", code)
+        raise _error(500, "Errore durante il salvataggio dei metadata.")
 
     logger.info("✅ Package pronto per %s", code)
 
@@ -208,17 +284,24 @@ def confirm_payment(payload: PaymentConfirmRequest, request: Request):
         raise _error(403, "Unauthorized")
 
     meta_path = storage.metadata_path(payload.code)
+    logger.info("📄 Metadata path confirm-payment: %s", meta_path)
 
     if not meta_path.exists():
         logger.warning("❌ Codice non trovato: %s", payload.code)
         raise _error(404, "Codice non trovato")
 
-    metadata = storage.load_metadata(payload.code)
+    try:
+        metadata = storage.load_metadata(payload.code)
+        logger.info("📖 Metadata caricati per %s: %s", payload.code, metadata)
+    except Exception:
+        logger.exception("💥 Errore load_metadata per %s", payload.code)
+        raise _error(500, "Errore lettura metadata.")
 
     if metadata.get("status") == "paid" and metadata.get("redeem_token"):
+        logger.info("ℹ️ Codice già pagato: %s", payload.code)
         return ConfirmPaymentResponse(
             redeem_token=metadata["redeem_token"],
-            status="paid"
+            status="paid",
         )
 
     token = generate_redeem_token()
@@ -226,7 +309,11 @@ def confirm_payment(payload: PaymentConfirmRequest, request: Request):
     metadata["redeem_token"] = token
     metadata["status"] = "paid"
 
-    storage.save_metadata(payload.code, metadata)
+    try:
+        storage.save_metadata(payload.code, metadata)
+    except Exception:
+        logger.exception("💥 Errore salvataggio metadata dopo pagamento: %s", payload.code)
+        raise _error(500, "Errore aggiornamento metadata.")
 
     logger.info("✅ Pagamento confermato per %s", payload.code)
 
@@ -235,15 +322,21 @@ def confirm_payment(payload: PaymentConfirmRequest, request: Request):
 
 @app.post("/api/redeem")
 def redeem(payload: RedeemRequest):
-    logger.info("🎟️ Redeem token: %s", payload.token)
+    logger.info("🎟️ Redeem token ricevuto: %s", payload.token)
 
-    code, metadata = storage.find_by_token(payload.token)
+    try:
+        code, metadata = storage.find_by_token(payload.token)
+        logger.info("🔎 Risultato find_by_token: code=%s metadata=%s", code, metadata)
+    except Exception:
+        logger.exception("💥 Errore find_by_token")
+        raise _error(500, "Errore ricerca token.")
 
     if not code or metadata.get("status") != "paid":
         logger.warning("❌ Token non valido")
         raise _error(403, "Token non valido")
 
     zip_path = storage.zip_path(code)
+    logger.info("🗜️ ZIP path: %s", zip_path)
 
     if not zip_path.exists():
         logger.error("❌ ZIP mancante per %s", code)
@@ -259,8 +352,10 @@ def download(public_code: str):
     logger.info("⬇️ Download diretto: %s", public_code)
 
     zip_path = storage.zip_path(public_code)
+    logger.info("🗜️ ZIP path download diretto: %s", zip_path)
 
     if not zip_path.exists():
+        logger.warning("❌ Pacchetto non trovato per download diretto: %s", public_code)
         raise _error(404, "Pacchetto non trovato")
 
     return FileResponse(zip_path, media_type="application/zip", filename=f"{public_code}.zip")
