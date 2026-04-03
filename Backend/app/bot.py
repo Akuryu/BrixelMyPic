@@ -129,10 +129,7 @@ async def start_bot_async():
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT, handle))
 
-    await application.initialize()
-    await application.start()
+    logger.info("🤖 Bot Telegram pronto")
 
-    logger.info("🤖 Bot Telegram avviato (async)")
-
-    # polling compatibile con loop esistente
-    await application.start_polling()
+    # 👇 trucco: esegue run_polling in thread separato
+    await asyncio.to_thread(application.run_polling)
