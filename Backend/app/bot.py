@@ -15,6 +15,8 @@ ALLOWED_USERS = set(settings.telegram_allowed_users)
 storage = Storage()
 
 
+# ------------------ CORE LOGIC ------------------
+
 def confirm_payment_internal(code: str):
     meta_path = storage.metadata_path(code)
 
@@ -38,9 +40,12 @@ def confirm_payment_internal(code: str):
     return token
 
 
+# ------------------ HANDLERS ------------------
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 LeoBrick Bot\n\nInvia un codice LEO-XXXX per generare il token RDM."
+        "🤖 LeoBrick Bot\n\n"
+        "Invia un codice LEO-XXXX per generare il token RDM."
     )
 
 
@@ -76,7 +81,9 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await msg.edit_text(f"❌ Errore: {str(e)}")
 
 
-def start_bot():
+# ------------------ START BOT (ASYNC SAFE) ------------------
+
+async def start_bot_async():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -84,4 +91,6 @@ def start_bot():
 
     logger.info("🤖 Bot Telegram avviato")
 
-    app.run_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()

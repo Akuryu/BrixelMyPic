@@ -232,11 +232,9 @@ def download(public_code: str):
 
 
 # 🚀 AVVIO BOT MIGLIORATO
-import threading
-from app.bot import start_bot
+import asyncio
+from app.bot import start_bot_async
 
-def start_background_bot():
-    thread = threading.Thread(target=start_bot, daemon=True)
-    thread.start()
-
-start_background_bot()
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(start_bot_async())
