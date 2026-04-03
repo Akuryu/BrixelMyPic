@@ -40,21 +40,28 @@ async def _read_image(file: UploadFile) -> bytes:
         raise _error(400, "File immagine mancante.")
 
     image_bytes = await file.read()
+    await file.seek(0)  # 🔥 evita problemi con stream riutilizzato
 
     if not image_bytes:
         raise _error(400, "Il file caricato è vuoto.")
 
     if len(image_bytes) > settings.max_upload_bytes:
-        raise _error(413, f"Il file supera il limite di {settings.max_upload_bytes // (1024 * 1024)} MB.")
+        raise _error(
+            413,
+            f"Il file supera il limite di {settings.max_upload_bytes // (1024 * 1024)} MB."
+        )
 
     try:
-        # 🔥 prova a leggere davvero l'immagine
+        # 🔥 apertura reale immagine
         img = Image.open(io.BytesIO(image_bytes))
 
-        # normalizza (fixa PNG strani, palette, alpha ecc.)
+        # 🔥 forza decoding completo (fix PNG strani)
+        img.load()
+
+        # 🔥 normalizza tutto (palette, alpha, ecc.)
         img = img.convert("RGB")
 
-        # risalva in formato pulito
+        # 🔥 risalva in formato pulito
         buffer = io.BytesIO()
         img.save(buffer, format="PNG")
 
