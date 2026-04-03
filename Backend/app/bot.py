@@ -88,8 +88,23 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     logger.info("USER: %s", user_id)
 
-    text = update.message.text.strip()
-    logger.info("TEXT ricevuto: %s", text)
+    raw_text = update.message.text.strip()
+    logger.info("TEXT ricevuto: %s", raw_text)
+
+    # estrai codice LEO-XXXX
+    parts = raw_text.split()
+
+    code = None
+    for part in parts:
+        if part.upper().startswith("LEO-"):
+            code = part.upper()
+            break
+
+    if not code:
+        await update.message.reply_text("❌ Inserisci un codice valido (LEO-XXXX)")
+        return
+
+    logger.info("Codice estratto: %s", code)
 
     if user_id not in ALLOWED_USERS:
         logger.warning("USER NON AUTORIZZATO: %s", user_id)
