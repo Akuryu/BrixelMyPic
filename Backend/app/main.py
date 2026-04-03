@@ -32,18 +32,36 @@ def _error(status_code: int, detail: str) -> HTTPException:
     return HTTPException(status_code=status_code, detail=detail)
 
 
+from PIL import Image
+import io
+
 async def _read_image(file: UploadFile) -> bytes:
     if not file.filename:
         raise _error(400, "File immagine mancante.")
-    content_type = (file.content_type or "").lower()
-    if content_type not in {"image/png", "image/jpeg", "image/webp"}:
-        raise _error(400, "Formato non supportato. Usa PNG, JPEG o WEBP.")
+
     image_bytes = await file.read()
+
     if not image_bytes:
         raise _error(400, "Il file caricato è vuoto.")
+
     if len(image_bytes) > settings.max_upload_bytes:
         raise _error(413, f"Il file supera il limite di {settings.max_upload_bytes // (1024 * 1024)} MB.")
-    return image_bytes
+
+    try:
+        # 🔥 prova a leggere davvero l'immagine
+        img = Image.open(io.BytesIO(image_bytes))
+
+        # normalizza (fixa PNG strani, palette, alpha ecc.)
+        img = img.convert("RGB")
+
+        # risalva in formato pulito
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+
+        return buffer.getvalue()
+
+    except Exception:
+        raise _error(400, "Immagine non valida o formato non supportato.")
 
 
 def _collect_form_params(form: dict[str, Any]) -> dict[str, Any]:
