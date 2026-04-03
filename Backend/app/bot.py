@@ -124,12 +124,15 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start_bot_async():
     logger.info("Avvio bot Telegram (async)...")
 
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT, handle))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT, handle))
 
-    logger.info("🤖 Bot Telegram pronto")
+    await application.initialize()
+    await application.start()
 
-    # questo gestisce tutto internamente
-    await app.run_polling()
+    logger.info("🤖 Bot Telegram avviato (async)")
+
+    # polling compatibile con loop esistente
+    await application.start_polling()
