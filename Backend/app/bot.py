@@ -91,7 +91,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     raw_text = update.message.text.strip()
     logger.info("TEXT ricevuto: %s", raw_text)
 
-    # estrai codice LEO-XXXX
+    # 🔥 estrazione codice LEO-XXXX (funziona con comandi e gruppi)
     parts = raw_text.split()
 
     code = None
@@ -109,13 +109,6 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id not in ALLOWED_USERS:
         logger.warning("USER NON AUTORIZZATO: %s", user_id)
         return
-
-    if not text.upper().startswith("LEO-"):
-        await update.message.reply_text("❌ Inserisci un codice valido (LEO-XXXX)")
-        return
-
-    code = text.strip()
-    logger.info("Codice processato: %s", code)
 
     msg = await update.message.reply_text("⏳ Genero token...")
 
