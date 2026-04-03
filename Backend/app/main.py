@@ -229,12 +229,3 @@ def download(public_code: str):
         raise _error(404, "Pacchetto non trovato")
 
     return FileResponse(zip_path, media_type="application/zip", filename=f"{public_code}.zip")
-
-
-# 🚀 AVVIO BOT MIGLIORATO
-import asyncio
-from app.bot import start_bot_async
-
-@app.on_event("startup")
-async def startup_event():
-    asyncio.create_task(start_bot_async())
