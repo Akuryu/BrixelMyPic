@@ -93,7 +93,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ------------------ START BOT ------------------
 
-def start_bot():
+async def start_bot_async():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -101,4 +101,6 @@ def start_bot():
 
     logger.info("🤖 Bot Telegram avviato")
 
-    app.run_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
