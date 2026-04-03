@@ -44,29 +44,30 @@ def confirm_payment_internal(code: str):
 
 # ------------------ HANDLERS ------------------
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "🤖 LeoBrick Bot\n\n"
-        "Invia un codice LEO-XXXX per generare il token RDM."
-    )
-
-
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not update.message or not update.message.text:
+    print("UPDATE RAW:", update)   # 👈 DEBUG FORZATO
+
+    if not update.message:
+        print("NO MESSAGE")
+        return
+
+    if not update.message.text:
+        print("NO TEXT")
         return
 
     user_id = update.effective_user.id
-
-    if user_id not in ALLOWED_USERS:
-        return
+    print("USER:", user_id)
 
     text = update.message.text.strip().upper()
+    print("TEXT:", text)
+
+    if user_id not in ALLOWED_USERS:
+        print("NOT ALLOWED")
+        return
 
     if not text.startswith("LEO-"):
         await update.message.reply_text("❌ Inserisci un codice valido (LEO-XXXX)")
         return
-
-    logger.info("User %s → %s", user_id, text)
 
     msg = await update.message.reply_text("⏳ Genero token...")
 
@@ -80,6 +81,7 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     except Exception as e:
+        print("ERROR:", str(e))
         await msg.edit_text(f"❌ Errore: {str(e)}")
 
 
