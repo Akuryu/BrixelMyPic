@@ -9,6 +9,7 @@ from typing import Any
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
 from PIL import Image, UnidentifiedImageError
+Image.MAX_IMAGE_PIXELS = 10_000_000  # 🔥 anti decompression bomb
 from starlette.middleware.cors import CORSMiddleware
 
 from .schemas import (
@@ -119,6 +120,11 @@ async def _read_image(file: UploadFile) -> bytes:
         original_content_type,
         len(image_bytes),
     )
+    
+    # 🔥 LIMITE HARD (anti-OOM)
+    if len(image_bytes) > 2_000_000:  # ~2MB
+        logger.warning("❌ File troppo grande: %d bytes", len(image_bytes))
+        raise _error(413, "File troppo grande (max 2MB).")
 
     if not image_bytes:
         raise _error(400, "Il file caricato è vuoto.")
@@ -131,6 +137,14 @@ async def _read_image(file: UploadFile) -> bytes:
 
     try:
         img = Image.open(io.BytesIO(image_bytes))
+
+        # 🔥 BLOCCO PRIMA DI LOAD (NON USA RAM)
+        w, h = img.size
+
+        if w * h > 5_000_000:  # ~5MP
+            logger.warning("❌ Immagine troppo grande: %sx%s", w, h)
+            raise _error(413, "Immagine troppo grande.")
+
         img.load()
 
         logger.info(
@@ -151,7 +165,7 @@ async def _read_image(file: UploadFile) -> bytes:
                 logger.info("🔧 Convertita in RGB")
 
         buffer = io.BytesIO()
-        img.save(buffer, format="PNG", optimize=True)
+        img.save(buffer, format="PNG")
         normalized_bytes = buffer.getvalue()
 
         logger.info(
@@ -222,6 +236,22 @@ async def preview(
 
     image_bytes = await _read_image(file)
     params = _collect_form_params(locals())
+    
+    # 🔥 HARD LIMIT BACKEND (NON BYPASSABILE)
+    try:
+        w = int(params.get("width") or 0)
+        h = int(params.get("height") or 0)
+
+        if w > 512 or h > 512:
+            logger.warning("❌ Dimensioni troppo grandi: %sx%s", w, h)
+            raise _error(400, "Dimensioni troppo grandi (max 512).")
+        
+        if w * h > 300_000:
+            logger.warning("❌ Preview area troppo grande: %sx%s", w, h)
+            raise _error(400, "Area troppo grande.")
+
+    except ValueError:
+        raise _error(400, "Parametri dimensione non validi.")
 
     logger.info("🧩 Parametri preview: %s", _safe_params_for_log(params))
 
@@ -260,6 +290,23 @@ async def prepare_package(
 
     image_bytes = await _read_image(file)
     params = _collect_form_params(locals())
+
+    # 🔥 HARD LIMIT BACKEND (ANTI-OOM)
+    try:
+        w = int(params.get("width") or 0)
+        h = int(params.get("height") or 0)
+
+        if w > 512 or h > 512:
+            logger.warning("❌ Package troppo grande: %sx%s", w, h)
+            raise _error(400, "Dimensioni troppo grandi (max 512).")
+
+        # 🔥 EXTRA SICUREZZA (consigliato)
+        if w * h > 300_000:
+            logger.warning("❌ Area troppo grande: %sx%s", w, h)
+            raise _error(400, "Area troppo grande.")
+
+    except ValueError:
+        raise _error(400, "Parametri dimensione non validi.")
 
     logger.info("🧩 Parametri package: %s", _safe_params_for_log(params))
 

@@ -36,36 +36,201 @@ let remotePreviewUrl = null;
 
 let generatedCode = null;
 
+let cropper = null;
+let rawFile = null;
+
+const cropModal = document.getElementById('cropModal');
+const cropImage = document.getElementById('cropImage');
+const cropConfirm = document.getElementById('cropConfirm');
+const cropCancel = document.getElementById('cropCancel');
+
+function snapToMultipleOf16(value) {
+  if (!Number.isFinite(value) || value < 16) return 16;
+  return Math.max(16, Math.round(value / 16) * 16);
+}
+
+function studToCm(studs) {
+  return (studs * 0.8).toFixed(1);
+}
+
+function ensureDimensionMeta(input) {
+  let meta = input.parentElement.querySelector('.dimension-meta');
+  if (!meta) {
+    meta = document.createElement('div');
+    meta.className = 'dimension-meta';
+    meta.style.fontSize = '12px';
+    meta.style.opacity = '0.72';
+    meta.style.marginTop = '6px';
+    input.parentElement.appendChild(meta);
+  }
+  return meta;
+}
+
+function updateDimensionDisplay(input) {
+  const raw = parseInt(input.value, 10);
+  const value = snapToMultipleOf16(raw);
+  input.value = value;
+
+  const meta = ensureDimensionMeta(input);
+  meta.textContent = `${value} stud · ${studToCm(value)} cm`;
+}
+
+function initDimensionInputs() {
+  const widthInput = generatorForm.querySelector('input[name="width"]');
+  const heightInput = generatorForm.querySelector('input[name="height"]');
+
+  [widthInput, heightInput].forEach((input) => {
+    if (!input) return;
+
+    input.step = 16;
+    updateDimensionDisplay(input);
+
+    input.addEventListener('input', () => {
+      const raw = parseInt(input.value, 10);
+      const meta = ensureDimensionMeta(input);
+      if (!Number.isFinite(raw) || raw < 16) {
+        meta.textContent = `16 stud · ${studToCm(16)} cm`;
+        return;
+      }
+      meta.textContent = `${raw} stud · ${studToCm(raw)} cm`;
+    });
+
+    input.addEventListener('blur', () => {
+      updateDimensionDisplay(input);
+    });
+  });
+}
+
 /* ------------------ HELPERS ------------------ */
 
 async function normalizeImageForUpload(file) {
-  const bitmap = await createImageBitmap(file);
+  const MAX_DIMENSION = 1600; // tipo WhatsApp (aggressivo)
+  const MAX_FILE_SIZE = 1.5 * 1024 * 1024; // ~1.5MB
+  const OUTPUT_TYPE = 'image/jpeg';
+
+  // -------- EXIF ORIENTATION --------
+  async function getOrientation(file) {
+    const buffer = await file.arrayBuffer();
+    const view = new DataView(buffer);
+
+    if (view.getUint16(0, false) !== 0xFFD8) return -2;
+
+    let offset = 2;
+    while (offset < view.byteLength) {
+      if (view.getUint16(offset + 2, false) <= 8) return -1;
+      const marker = view.getUint16(offset, false);
+      offset += 2;
+
+      if (marker === 0xFFE1) {
+        if (view.getUint32(offset += 2, false) !== 0x45786966) return -1;
+
+        const little = view.getUint16(offset += 6, false) === 0x4949;
+        offset += view.getUint32(offset + 4, little);
+
+        const tags = view.getUint16(offset, little);
+        offset += 2;
+
+        for (let i = 0; i < tags; i++) {
+          if (view.getUint16(offset + (i * 12), little) === 0x0112) {
+            return view.getUint16(offset + (i * 12) + 8, little);
+          }
+        }
+      } else if ((marker & 0xFF00) !== 0xFF00) {
+        break;
+      } else {
+        offset += view.getUint16(offset, false);
+      }
+    }
+    return -1;
+  }
+
+  // -------- LOAD IMAGE (SAFE MOBILE) --------
+  let img;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    img = bitmap;
+  } catch (e) {
+    img = await new Promise((resolve, reject) => {
+      const image = new Image();
+      const url = URL.createObjectURL(file);
+
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(image);
+      };
+
+      image.onerror = reject;
+      image.src = url;
+    });
+  }
+
+  let width = img.width;
+  let height = img.height;
+
+  // -------- RESIZE (WHATSAPP STYLE) --------
+  if (Math.max(width, height) > MAX_DIMENSION) {
+    const scale = MAX_DIMENSION / Math.max(width, height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+  }
+
+  const orientation = await getOrientation(file);
 
   const canvas = document.createElement('canvas');
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
-
   const ctx = canvas.getContext('2d', { alpha: false });
+
+  // gestione rotazione
+  if (orientation === 6 || orientation === 8) {
+    canvas.width = height;
+    canvas.height = width;
+  } else {
+    canvas.width = width;
+    canvas.height = height;
+  }
 
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(bitmap, 0, 0);
 
-  const blob = await new Promise((resolve, reject) => {
-    canvas.toBlob((b) => {
-      if (!b) {
-        reject(new Error('Impossibile normalizzare l’immagine.'));
-        return;
-      }
-      resolve(b);
-    }, 'image/png');
+  // -------- APPLY ORIENTATION --------
+  switch (orientation) {
+    case 6:
+      ctx.rotate(90 * Math.PI / 180);
+      ctx.drawImage(img, 0, -height, width, height);
+      break;
+    case 3:
+      ctx.rotate(Math.PI);
+      ctx.drawImage(img, -width, -height, width, height);
+      break;
+    case 8:
+      ctx.rotate(-90 * Math.PI / 180);
+      ctx.drawImage(img, -width, 0, width, height);
+      break;
+    default:
+      ctx.drawImage(img, 0, 0, width, height);
+  }
+
+  // -------- COMPRESSION --------
+  let quality = 0.82;
+  let blob = await new Promise(res => canvas.toBlob(res, OUTPUT_TYPE, quality));
+
+  while (blob.size > MAX_FILE_SIZE && quality > 0.5) {
+    quality -= 0.08;
+    blob = await new Promise(res => canvas.toBlob(res, OUTPUT_TYPE, quality));
+  }
+
+  console.log("📦 FINAL IMAGE:", {
+    width,
+    height,
+    size: blob.size,
+    quality
   });
 
   return new File(
     [blob],
-    file.name.replace(/\.[^.]+$/, '') + '.png',
+    file.name.replace(/\.[^.]+$/, '') + '.jpg',
     {
-      type: 'image/png',
+      type: OUTPUT_TYPE,
       lastModified: Date.now()
     }
   );
@@ -197,6 +362,7 @@ function setLoadingState(isLoading) {
 
 async function setPreview(file) {
   try {
+	console.log("SET PREVIEW FILE:", file);
     const normalizedFile = await normalizeImageForUpload(file);
     currentFile = normalizedFile;
 
@@ -254,7 +420,27 @@ function validateFile(file) {
   if (!file) return 'Nessun file selezionato.';
   if (!file.type.startsWith('image/')) return 'Carica un file immagine valido.';
   if (file.size > 15 * 1024 * 1024) return 'Il file supera 15 MB.';
-  return null;
+
+  // 🔥 NUOVO: controllo dimensioni reali
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+
+      const maxDim = Math.max(img.width, img.height);
+
+      if (maxDim > 4000) {
+        resolve('Immagine troppo grande (max 4000px).');
+      } else {
+        resolve(null);
+      }
+    };
+
+    img.onerror = () => resolve('Errore lettura immagine.');
+    img.src = url;
+  });
 }
 
 /* ------------------ FORM DATA ------------------ */
@@ -262,6 +448,27 @@ function validateFile(file) {
 function collectFormData() {
   const formData = new FormData();
   formData.append('file', currentFile);
+
+  const widthInput = generatorForm.querySelector('input[name="width"]');
+  const heightInput = generatorForm.querySelector('input[name="height"]');
+
+    // 🔥 HARD LIMIT FRONTEND (ANTI-BYPASS)
+  const MAX = 512;
+  
+  let w = parseInt(widthInput.value, 10);
+  let h = parseInt(heightInput.value, 10);
+  
+  if (!Number.isFinite(w)) w = 16;
+  if (!Number.isFinite(h)) h = 16;
+  
+  if (w > MAX) w = MAX;
+  if (h > MAX) h = MAX;
+  
+  widthInput.value = w;
+  heightInput.value = h;
+  
+  if (widthInput) updateDimensionDisplay(widthInput);
+  if (heightInput) updateDimensionDisplay(heightInput);
 
   const data = new FormData(generatorForm);
 
@@ -323,7 +530,7 @@ if (previewButton) {
 generatorForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const error = validateFile(currentFile);
+  const error = await validateFile(currentFile);
   if (error) {
     setStatus(error);
     return;
@@ -442,6 +649,100 @@ function renderPayPal() {
   }).render('#paypalButtonsContainer');
 }
 
+function openCrop(file) {
+  rawFile = file;
+
+  const url = URL.createObjectURL(file);
+
+  cropImage.onload = () => {
+    if (cropper) cropper.destroy();
+
+    cropper = new Cropper(cropImage, {
+      viewMode: 1,
+      autoCropArea: 1,
+      background: false
+    });
+
+    URL.revokeObjectURL(url);
+  };
+
+  cropImage.src = url;
+  cropModal.hidden = false;
+}
+
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
+function updateDimensionsFromCrop(w, h) {
+  const divisor = gcd(w, h);
+
+  let ratioW = Math.round(w / divisor);
+  let ratioH = Math.round(h / divisor);
+
+  const MAX_RATIO_SIDE = 10;
+
+  if (ratioW > MAX_RATIO_SIDE || ratioH > MAX_RATIO_SIDE) {
+    const scale = Math.max(ratioW, ratioH) / MAX_RATIO_SIDE;
+    ratioW = Math.max(1, Math.round(ratioW / scale));
+    ratioH = Math.max(1, Math.round(ratioH / scale));
+  }
+
+  const widthInput = generatorForm.querySelector('input[name="width"]');
+  const heightInput = generatorForm.querySelector('input[name="height"]');
+
+  widthInput.value = ratioW * 16;
+  heightInput.value = ratioH * 16;
+
+  updateDimensionDisplay(widthInput);
+  updateDimensionDisplay(heightInput);
+
+  console.log("📐 Ratio normalizzato:", ratioW + ":" + ratioH);
+}
+
+cropConfirm.addEventListener('click', async () => {
+  if (!cropper) return;
+
+  const canvas = cropper.getCroppedCanvas({
+    fillColor: '#ffffff'
+  });
+
+  const blob = await new Promise((resolve, reject) => {
+    canvas.toBlob((b) => {
+      if (!b) {
+        reject(new Error('Impossibile creare il crop.'));
+        return;
+      }
+      resolve(b);
+    }, 'image/jpeg', 0.9);
+  });
+
+  const croppedFile = new File(
+    [blob],
+    rawFile.name.replace(/\.[^.]+$/, '') + '.jpg',
+    { type: 'image/jpeg', lastModified: Date.now() }
+  );
+
+  const dt = new DataTransfer();
+  dt.items.add(croppedFile);
+  fileInput.files = dt.files;
+
+  await setPreview(croppedFile);
+  updateDimensionsFromCrop(canvas.width, canvas.height);
+  updateSubmitState();
+  setStatus(`${rawFile.name} selezionato.`);
+
+  cropModal.hidden = true;
+  cropper.destroy();
+  cropper = null;
+});
+
+cropCancel.addEventListener('click', () => {
+  cropModal.hidden = true;
+  if (cropper) cropper.destroy();
+  cropper = null;
+});
+
 /* ------------------ REDEEM ------------------ */
 
 if (redeemButton) {
@@ -466,8 +767,14 @@ if (redeemButton) {
 /* ------------------ EVENTS ------------------ */
 
 fileInput.addEventListener('change', (event) => {
+  console.log("FILE CHANGE TRIGGERED");
+
   const file = event.target.files?.[0];
-  if (file) setPreview(file);
+  console.log("FILE:", file);
+
+  if (!file) return;
+
+  openCrop(file);
 });
 
 ['dragenter', 'dragover'].forEach((eventName) => {
@@ -487,10 +794,7 @@ fileInput.addEventListener('change', (event) => {
 dropzone.addEventListener('drop', (event) => {
   const file = event.dataTransfer?.files?.[0];
   if (file) {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    fileInput.files = dt.files;
-    setPreview(file);
+    openCrop(file);
   }
 });
 
@@ -511,3 +815,5 @@ if (manualConfirmButton) {
 updateSubmitState();
 initHeroPixels();
 initReveal();
+initDimensionInputs();
+console.log("JS CARICATO");

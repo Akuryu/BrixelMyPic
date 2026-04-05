@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+ <link href="https://unpkg.com/cropperjs@1.6.1/dist/cropper.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="bg-orb orb-1"></div>
@@ -105,7 +106,7 @@
       <div class="generator-grid">
         <div class="upload-panel glass reveal">
           <label class="dropzone" id="dropzone" for="fileInput">
-            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+            <input id="fileInput" type="file" accept="image/*" hidden />
 
             <div class="dropzone-shell">
               <div class="dropzone-icon">⬆</div>
@@ -146,11 +147,11 @@
           <div class="control-grid">
             <label class="field">
               <span>Larghezza finale</span>
-              <input type="number" name="width" min="16" max="512" step="1" value="128" />
+              <input type="number" name="width" min="16" max="512" step="1" value="16" />
             </label>
             <label class="field">
               <span>Altezza finale</span>
-              <input type="number" name="height" min="16" max="512" step="1" value="96" />
+              <input type="number" name="height" min="16" max="512" step="1" value="16" />
             </label>
             <label class="field">
               <span>Tipo pezzo</span>
@@ -324,9 +325,31 @@
       </div>
     </section>
   </main>
+  
+  <div id="cropModal" class="crop-modal" hidden>
+  <div class="crop-container glass">
+    
+    <div class="crop-header">
+      <strong>Ritaglia immagine</strong>
+      <span class="crop-hint">Scegli l’inquadratura (rapporto automatico)</span>
+    </div>
+
+    <div class="crop-body">
+      <img id="cropImage" />
+    </div>
+
+    <div class="crop-actions">
+      <button id="cropCancel" class="btn btn-secondary">Annulla</button>
+      <button id="cropConfirm" class="btn btn-primary">Conferma</button>
+    </div>
+
+  </div>
+</div>
 
   <script src="config.js"></script>
   <script src="https://www.paypal.com/sdk/js?client-id=AWaPZJJiMaHRpeBwQobgWWpIkp7sv4q3dBz9sn_2RhuwZInzWL52VclbVO6heW1776HRajdHjVM9eqCC&currency=EUR&intent=capture"></script>
+  <script src="https://unpkg.com/cropperjs@1.6.1/dist/cropper.min.js"></script>
   <script src="app.js"></script>
+  
 </body>
 </html>

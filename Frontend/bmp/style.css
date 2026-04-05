@@ -106,6 +106,47 @@ img { max-width: 100%; }
   white-space: nowrap;
 }
 
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.crop-modal[hidden] {
+  display: none !important;
+}
+
+.crop-container {
+  width: 90%;
+  max-width: 900px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #111;
+}
+
+.crop-body {
+  flex: 1;
+  overflow: hidden;
+}
+
+#cropImage {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.crop-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
 .nav {
   display: flex;
   align-items: center;
