@@ -639,26 +639,35 @@ function renderPayPal() {
     return;
   }
 
-  paypal.Buttons({
+  if (!generatedCode || !generatedCode.startsWith('LEO-')) {
+  setStatus('Codice non valido.');
+  return;
+}
+
+paypal.Buttons({
     createOrder: (data, actions) => {
-      return actions.order.create({
-        purchase_units: [{
-          amount: { value: '5.00' }
-        }]
-      });
-    },
+  return actions.order.create({
+    purchase_units: [{
+      amount: { value: '5.00' }
+    }]
+  });
+},
 
     onApprove: async (data, actions) => {
-      try {
-        await actions.order.capture();
+  try {
+    const capture = await actions.order.capture();
 
-        setStatus('Pagamento confermato...');
+    setStatus('Pagamento confermato...');
 
-        const res = await fetch(`${apiBase}/api/confirm-payment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: generatedCode })
-        });
+    const res = await fetch(`${apiBase}/api/confirm-payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: generatedCode,
+        order_id: data.orderID,
+        paypal_capture_id: capture.id
+      })
+    });
 
         if (!res.ok) {
           const payload = await res.json().catch(() => ({}));

@@ -353,46 +353,39 @@ async def prepare_package(
 
 
 @app.post("/api/confirm-payment", response_model=ConfirmPaymentResponse)
-def confirm_payment(payload: PaymentConfirmRequest, request: Request):
+def confirm_payment(payload: PaymentConfirmRequest):
     logger.info("💳 Confirm payment per %s", payload.code)
 
-    api_key = request.headers.get("X-API-KEY")
-
-    if api_key != settings.internal_api_key:
-        logger.warning("❌ API KEY non valida")
-        raise _error(403, "Unauthorized")
+    if not payload.order_id or not payload.paypal_capture_id:
+        raise _error(400, "Dati pagamento mancanti")
 
     meta_path = storage.metadata_path(payload.code)
-    logger.info("📄 Metadata path confirm-payment: %s", meta_path)
 
     if not meta_path.exists():
-        logger.warning("❌ Codice non trovato: %s", payload.code)
         raise _error(404, "Codice non trovato")
 
-    try:
-        metadata = storage.load_metadata(payload.code)
-        logger.info("📖 Metadata caricati per %s: %s", payload.code, metadata)
-    except Exception:
-        logger.exception("💥 Errore load_metadata per %s", payload.code)
-        raise _error(500, "Errore lettura metadata.")
+    metadata = storage.load_metadata(payload.code)
 
+    # 🔥 già pagato → idempotente
     if metadata.get("status") == "paid" and metadata.get("redeem_token"):
-        logger.info("ℹ️ Codice già pagato: %s", payload.code)
         return ConfirmPaymentResponse(
             redeem_token=metadata["redeem_token"],
             status="paid",
         )
 
+    # 🔥 binding ordine (anti replay)
+    if metadata.get("paypal_capture_id"):
+        if metadata["paypal_capture_id"] != payload.paypal_capture_id:
+            raise _error(403, "Pagamento non valido")
+
     token = generate_redeem_token()
 
     metadata["redeem_token"] = token
     metadata["status"] = "paid"
+    metadata["paypal_order_id"] = payload.order_id
+    metadata["paypal_capture_id"] = payload.paypal_capture_id
 
-    try:
-        storage.save_metadata(payload.code, metadata)
-    except Exception:
-        logger.exception("💥 Errore salvataggio metadata dopo pagamento: %s", payload.code)
-        raise _error(500, "Errore aggiornamento metadata.")
+    storage.save_metadata(payload.code, metadata)
 
     logger.info("✅ Pagamento confermato per %s", payload.code)
 

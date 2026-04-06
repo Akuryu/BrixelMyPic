@@ -6,6 +6,8 @@ from typing import Any
 
 class PaymentConfirmRequest(BaseModel):
     code: str = Field(..., min_length=4)
+    order_id: str
+    paypal_capture_id: str
 
 
 class RedeemRequest(BaseModel):
