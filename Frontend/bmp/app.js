@@ -35,6 +35,7 @@ let previewObjectUrl = null;
 let remotePreviewUrl = null;
 
 let generatedCode = null;
+let previewDone = false;
 
 let cropper = null;
 let rawFile = null;
@@ -373,10 +374,14 @@ function initReveal() {
 /* ------------------ STATE ------------------ */
 
 function updateSubmitState() {
-  submitButton.disabled = !currentFile;
+  submitButton.disabled = !currentFile || !previewDone;
   if (previewButton) previewButton.disabled = !currentFile;
-  uploadBadge.textContent = currentFile ? 'File pronto' : 'Nessun file';
-  uploadBadge.classList.toggle('is-ready', Boolean(currentFile));
+
+  uploadBadge.textContent = currentFile
+    ? (previewDone ? 'Preview pronta' : 'Genera preview')
+    : 'Nessun file';
+
+  uploadBadge.classList.toggle('is-ready', Boolean(currentFile && previewDone));
 }
 
 function setStatus(message) {
@@ -393,6 +398,7 @@ function setLoadingState(isLoading) {
 
 async function setPreview(file) {
   try {
+	previewDone = false;
 	console.log("SET PREVIEW FILE:", file);
     const normalizedFile = await normalizeImageForUpload(file);
     currentFile = normalizedFile;
@@ -424,6 +430,7 @@ function resetPreview() {
   previewImage.removeAttribute('src');
   previewName.textContent = 'Immagine pronta';
   previewCard.hidden = true;
+  previewDone = false;
 
   dropzone.classList.remove('has-file', 'dragover');
 
@@ -549,6 +556,8 @@ if (previewButton) {
     try {
       setStatus('Genero preview...');
       await loadRemotePreview();
+	  previewDone = true;
+	  updateSubmitState();
       setStatus('Preview pronta.');
     } catch (error) {
       setStatus(error.message || 'Errore preview.');
