@@ -44,6 +44,37 @@ const cropImage = document.getElementById('cropImage');
 const cropConfirm = document.getElementById('cropConfirm');
 const cropCancel = document.getElementById('cropCancel');
 
+cropCancel.addEventListener('click', () => {
+  cropModal.hidden = true;
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+});
+
+cropConfirm.addEventListener('click', async () => {
+  if (!cropper) return;
+
+  const canvas = cropper.getCroppedCanvas({
+    fillColor: '#ffffff'
+  });
+
+  const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+
+  const croppedFile = new File([blob], rawFile.name, {
+    type: 'image/png'
+  });
+
+  cropModal.hidden = true;
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  setPreview(croppedFile);
+});
+
 function snapToMultipleOf16(value) {
   if (!Number.isFinite(value) || value < 16) return 16;
   return Math.max(16, Math.round(value / 16) * 16);
@@ -655,16 +686,26 @@ function openCrop(file) {
   const url = URL.createObjectURL(file);
 
   cropImage.onload = () => {
-    if (cropper) cropper.destroy();
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
 
-    cropper = new Cropper(cropImage, {
-      viewMode: 1,
-      autoCropArea: 1,
-      background: false
-    });
+  cropper = new Cropper(cropImage, {
+    viewMode: 1,
+    autoCropArea: 1,
+    background: false,
+    responsive: true,
+    checkOrientation: false,
+    movable: true,
+    zoomable: true,
+    scalable: false,
+    rotatable: false,
+    dragMode: 'move'
+  });
 
-    URL.revokeObjectURL(url);
-  };
+  URL.revokeObjectURL(url);
+};
 
   cropImage.src = url;
   cropModal.hidden = false;
