@@ -42,14 +42,6 @@ logger = logging.getLogger("leobrick")
 
 app = FastAPI(title=settings.app_name)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r"https://(.*\.)?leobrick\.com",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 storage = Storage()
 
 
