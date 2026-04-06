@@ -356,8 +356,17 @@ async def prepare_package(
 def confirm_payment(payload: PaymentConfirmRequest):
     logger.info("💳 Confirm payment per %s", payload.code)
 
+    # 🔥 VALIDAZIONE BASE
+    if not payload.code or not payload.code.startswith("LEO-"):
+        raise _error(400, "Codice non valido")
+
     if not payload.order_id or not payload.paypal_capture_id:
         raise _error(400, "Dati pagamento mancanti")
+
+    # 🔥 BLOCCO SANDBOX IN PRODUZIONE
+    if not payload.order_id.startswith("LIVE"):
+        logger.warning("❌ ordine sandbox non accettato")
+        raise _error(403, "Pagamento non valido")
 
     meta_path = storage.metadata_path(payload.code)
 
@@ -366,24 +375,28 @@ def confirm_payment(payload: PaymentConfirmRequest):
 
     metadata = storage.load_metadata(payload.code)
 
-    # 🔥 già pagato → idempotente
+    # 🔥 IDEMPOTENZA
     if metadata.get("status") == "paid" and metadata.get("redeem_token"):
         return ConfirmPaymentResponse(
             redeem_token=metadata["redeem_token"],
             status="paid",
         )
 
-    # 🔥 binding ordine (anti replay)
+    # 🔥 ANTI REPLAY (capture id binding)
     if metadata.get("paypal_capture_id"):
         if metadata["paypal_capture_id"] != payload.paypal_capture_id:
-            raise _error(403, "Pagamento non valido")
+            raise _error(403, "Pagamento duplicato o non valido")
 
+    # 🔥 GENERAZIONE TOKEN SICURO
     token = generate_redeem_token()
 
-    metadata["redeem_token"] = token
-    metadata["status"] = "paid"
-    metadata["paypal_order_id"] = payload.order_id
-    metadata["paypal_capture_id"] = payload.paypal_capture_id
+    metadata.update({
+        "redeem_token": token,
+        "status": "paid",
+        "paypal_order_id": payload.order_id,
+        "paypal_capture_id": payload.paypal_capture_id,
+        "paid_at": utc_timestamp(),
+    })
 
     storage.save_metadata(payload.code, metadata)
 
