@@ -107,10 +107,10 @@ img { max-width: 100%; }
 
 /* usa lo stesso gradiente della hero */
 .brand-text {
-  font-size: 20px;
+  font-size: 35px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1;
+  line-height: 2;
   white-space: nowrap;
 }
 
